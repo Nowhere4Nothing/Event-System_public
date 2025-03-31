@@ -1,11 +1,16 @@
+import Hero from '../components/Hero';
+import SearchBar from '../components/SearchBar';
+import FeaturedEvents from '../components/FeaturedEvents';
+import '../assets/styles/main.css';
+
 function Home() {
-    return (
-      <div>
-        <h1>Welcome to Eventual Events</h1>
-        <p>Find and book events in just a few clicks.</p>
-      </div>
-    );
-  }
-  
-  export default Home;
-  
+  return (
+    <div className="home">
+      <Hero />
+      <SearchBar />
+      <FeaturedEvents />
+    </div>
+  );
+}
+
+export default Home;

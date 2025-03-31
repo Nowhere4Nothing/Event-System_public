@@ -1,14 +1,29 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import '../assets/styles/main.css'; // optional, or just keep using main.css
 
 function Navbar() {
   return (
-    <nav>
-      <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/events">Events</Link></li>
-        <li><Link to="/organizer">Organizer</Link></li>
-      </ul>
-    </nav>
+    <nav className="navbar">
+  <div className="logo">Eventual Events</div>
+  <ul className="nav-links">
+    <li>
+      <NavLink to="/" className={({ isActive }) => isActive ? 'active-link' : ''}>
+        Home
+      </NavLink>
+    </li>
+    <li>
+      <NavLink to="/events" className={({ isActive }) => isActive ? 'active-link' : ''}>
+        Events
+      </NavLink>
+    </li>
+    <li>
+      <NavLink to="/organizer" className={({ isActive }) => isActive ? 'active-link' : ''}>
+        Organizer
+      </NavLink>
+    </li>
+  </ul>
+</nav>
+
   );
 }
 
