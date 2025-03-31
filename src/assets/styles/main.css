@@ -151,4 +151,11 @@ body {
     margin-top: 4rem;
     font-size: 0.9rem;
   }
+  /* In main.css */
+.events-page h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-top: 2rem;
+  }
+  
   
