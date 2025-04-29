@@ -1,13 +1,20 @@
-import { Link } from 'react-router-dom';
+import './Navbar.css';
 
 function Navbar() {
   return (
-    <nav>
-      <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/events">Events</Link></li>
-        <li><Link to="/organizer">Organizer</Link></li>
-      </ul>
+    <nav className="navbar">
+      <div className="logo">Eventual</div>
+
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search for events..."
+          className="search-input"
+        />
+        <button className="search-button">Search</button>
+      </div>
+
+      <button className="account-button">Account</button>
     </nav>
   );
 }

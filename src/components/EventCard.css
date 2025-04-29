@@ -1,0 +1,19 @@
+.event-card-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .event-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease;
+    text-align: center;
+    min-width: 260px;
+  }
+  
+  .event-card:hover {
+    transform: translateY(-4px);
+  }
+  

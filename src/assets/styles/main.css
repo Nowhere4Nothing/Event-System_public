@@ -1,14 +1,24 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 1rem;
-    background: #f9f9f9;
+/* === FONT FACES === */
+@font-face {
+    font-family: 'HeadingNow';
+    src: url('../fonts/HeadingNowTrial-06Bold.ttf') format('truetype');
+    font-weight: bold;
   }
   
-  nav ul {
-    display: flex;
-    gap: 1rem;
-    list-style: none;
+  @font-face {
+    font-family: 'NeueHaas';
+    src: url('../fonts/HaasGrotDisp-55Roman.otf') format('opentype');
+    font-weight: normal;
+  }
+  
+  /* === GLOBAL STYLES === */
+  * {
+    margin: 0;
     padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif; /* OR 'Inter', sans-serif */
   }
   
