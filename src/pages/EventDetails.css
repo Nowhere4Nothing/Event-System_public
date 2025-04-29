@@ -1,0 +1,77 @@
+.event-details-page {
+    padding: 40px;
+    font-family: 'Neue Haas Grotesk', sans-serif;
+  }
+  
+  .event-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #f95700;
+  }
+  
+  .event-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  
+  .ticket-section, .seating-section {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+  
+  .ticket-option {
+    margin-bottom: 20px;
+  }
+  
+  .seating-map-placeholder {
+    height: 300px;
+    border: 2px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    background-color: #faf8f5;
+    border-radius: 8px;
+  }
+
+  /* Seating section */
+.seating-section {
+    margin-top: 2rem;
+  }
+  
+  .seating-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .seating-selector label {
+    font-weight: 600;
+    font-family: 'Neue Haas Grotesk', sans-serif;
+    color: #2c2c2c;
+  }
+  
+  .seating-selector select {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    font-family: 'Neue Haas Grotesk', sans-serif;
+    background-color: #fff;
+    color: #2c2c2c;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  
+  .seating-selector select:focus {
+    border-color: #f95700;
+    box-shadow: 0 0 0 2px rgba(249, 87, 0, 0.2);
+  }
+  

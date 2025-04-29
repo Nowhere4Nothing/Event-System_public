@@ -1,28 +1,42 @@
-import EventCard from './EventCard';
+import React from 'react';
+import './FeaturedEvents.css';
+
+const featuredEvents = [
+  {
+    id: 1,
+    title: 'React Developers Meetup',
+    date: '2025-09-05',
+    location: 'Online',
+    price: 'Free',
+  },
+  {
+    id: 2,
+    title: 'AI & Machine Learning Expo',
+    date: '2025-10-15',
+    location: 'Sydney',
+    price: '$120',
+  },
+  {
+    id: 3,
+    title: 'Blockchain Summit 2025',
+    date: '2025-11-20',
+    location: 'Melbourne',
+    price: '$80',
+  },
+];
 
 function FeaturedEvents() {
-  // Mock data (you can fetch later from backend)
-  const events = [
-    { id: 1, title: 'Tech Conference 2025', date: '2025-06-10', location: 'Sydney', price: '$99' },
-    { id: 2, title: 'Startup Pitch Night', date: '2025-07-03', location: 'Melbourne', price: 'Free' },
-    { id: 3, title: 'Art & Wine Festival', date: '2025-08-15', location: 'Brisbane', price: '$49' },
-  ];
-
   return (
-    <section className="featured-events">
-      <h2>Featured Events</h2>
-      <div className="event-grid">
-        {events.map(event => (
-          <EventCard
-            key={event.id}
-            title={event.title}
-            date={event.date}
-            location={event.location}
-            price={event.price}
-          />
-        ))}
-      </div>
-    </section>
+    <div className="featured-events-container">
+      {featuredEvents.map((event) => (
+        <div key={event.id} className="event-card">
+          <h3>{event.title}</h3>
+          <p>{event.date}</p>
+          <p>{event.location}</p>
+          <p>{event.price}</p>
+        </div>
+      ))}
+    </div>
   );
 }
 
