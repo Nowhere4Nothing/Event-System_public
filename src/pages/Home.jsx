@@ -22,23 +22,23 @@ function Home() {
     <div className="home-page">
       <Categories />
 
-      <section className="events-section">
-  <h2 className="section-heading">Upcoming Events</h2>
-  <div className="events-grid">
-    {allEvents.slice(0, 3).map(event => (
-      <EventCard key={event.id} {...event} />
-    ))}
-  </div>
-</section>
+{/*      <section className="events-section">*/}
+{/*  <h2 className="section-heading">Upcoming Events</h2>*/}
+{/*  <div className="events-grid">*/}
+{/*    {allEvents.slice(0, 3).map(event => (*/}
+{/*      <EventCard key={event.id} {...event} />*/}
+{/*    ))}*/}
+{/*  </div>*/}
+{/*</section>*/}
 
-<section className="events-section">
-  <h2 className="section-heading">Featured Events</h2>
-  <div className="events-grid">
-    {allEvents.slice(3).map(event => (
-      <EventCard key={event.id} {...event} />
-    ))}
-  </div>
-</section>
+{/*<section className="events-section">*/}
+{/*  <h2 className="section-heading">Featured Events</h2>*/}
+{/*  <div className="events-grid">*/}
+{/*    {allEvents.slice(3).map(event => (*/}
+{/*      <EventCard key={event.id} {...event} />*/}
+{/*    ))}*/}
+{/*  </div>*/}
+{/*</section>*/}
 
     </div>
   );
