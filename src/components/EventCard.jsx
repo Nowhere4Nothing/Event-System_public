@@ -1,17 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import './EventCard.css';
+import './EventCard.css'; // Assuming you have styles
 
-function EventCard({ id, title, date, location, price }) {
+function EventCard({ event }) {
   return (
-    <Link to={`/events/${id}`} className="event-card-link">
-      <div className="event-card">
-        <h3>{title}</h3>
-        <p>{date}</p>
-        <p>{location}</p>
-        <p>{price}</p>
-      </div>
-    </Link>
+    <div className="event-card">
+      <h3>{event.eventName}</h3>
+      <p>{event.eventDesc}</p>
+      <p>Date: {event.eventDate}</p>
+      <p>Time: {event.eventTime}</p>
+      <p>Venue ID: {event.venueName}</p>
+      <p>Performer: {event.performer}</p>
+    </div>
   );
 }
 

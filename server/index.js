@@ -1,24 +1,39 @@
+// server.js or routes/events.js
 const express = require('express');
+const app = express();
 const cors = require('cors');
 const db = require('./database');
 
-const app = express();
-const PORT = 5000;
-
-app.use(cors());
+app.use(cors()); // Enable CORS
 app.use(express.json());
 
-// Your /events route
 app.get('/events', (req, res) => {
-  db.all('SELECT * FROM Event', [], (err, rows) => {
+  const query = `
+    SELECT 
+      Event.eventID,
+      Event.eventName,
+      Event.eventType,
+      Event.eventDate,
+      Event.venueID,
+      Venue.venueName,
+      Event.eventDesc,
+      Event.eventTime,
+      Event.performer,
+      Event.banner,
+      Event.organiserID
+    FROM Event
+    LEFT JOIN Venue ON Event.venueID = Venue.venueID
+  `;
+
+  db.all(query, [], (err, rows) => {
     if (err) {
-      console.error(err.message);
-      return res.status(500).json({ error: err.message });
+      console.error('Error fetching events with venue names:', err.message);
+      return res.status(500).json({ error: 'Failed to fetch events' });
     }
     res.json(rows);
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(5000, () => {
+  console.log('Server running on http://localhost:5000');
 });
