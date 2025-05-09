@@ -1,0 +1,68 @@
+  .account-page {
+    padding: 40px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .account-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #f95700;
+  }
+  
+  .account-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  
+  .user-details-section,
+  .events-section {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    text-align: left;
+  }
+  
+  .user-details-section h2,
+  .events-section h2 {
+    margin-bottom: 20px;
+    color: #f95700;
+  }
+  
+  .user-details-display p {
+    margin: 10px 0;
+  }
+  
+  .user-details-form label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .user-details-form input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .user-details-form button,
+  .user-details-display button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #f95700;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .user-details-form button:hover,
+  .user-details-display button:hover {
+    background-color: #e04e00;
+  }

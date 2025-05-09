@@ -4,8 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import EventDetails from './pages/EventDetails';
 import LoginPage from './pages/LoginPage';
-
-
+import AccountPage from './pages/AccountPage';
 
 function App() {
   return (
@@ -15,7 +14,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/events/:id" element={<EventDetails />} />
       <Route path="/login" element={<LoginPage />} />
-
+      <Route path="/account" element={<AccountPage />} />
       </Routes>
     </Router>
   );
