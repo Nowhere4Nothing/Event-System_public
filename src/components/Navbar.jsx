@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './Navbar.css';
+import { useNavigate } from 'react-router-dom';
 
 function Navbar() {
+    const navigate = useNavigate();
     const [events, setEvents] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
@@ -43,6 +45,8 @@ function Navbar() {
         </button>
       </div>
 
+      <button className="account-button" onClick={() => navigate('/login')}>Account</button>
+
       <button className="account-button">Account</button>
 
         {/*Display filtered events */}
@@ -51,6 +55,7 @@ function Navbar() {
                 <div key={event.eventName}></div>
             ))}
         </div>
+
     </nav>
   );
 }

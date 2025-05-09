@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import EventDetails from './pages/EventDetails';
+import LoginPage from './pages/LoginPage';
 import AccountPage from './pages/AccountPage';
 
 function App() {
@@ -12,8 +13,8 @@ function App() {
       <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/events/:id" element={<EventDetails />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/account" element={<AccountPage />} />
-
       </Routes>
     </Router>
   );
