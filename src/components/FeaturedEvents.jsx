@@ -1,41 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import EventCard from '../components/EventCard';
 import './FeaturedEvents.css';
 
-const featuredEvents = [
-  {
-    id: 1,
-    title: 'React Developers Meetup',
-    date: '2025-09-05',
-    location: 'Online',
-    price: 'Free',
-  },
-  {
-    id: 2,
-    title: 'AI & Machine Learning Expo',
-    date: '2025-10-15',
-    location: 'Sydney',
-    price: '$120',
-  },
-  {
-    id: 3,
-    title: 'Blockchain Summit 2025',
-    date: '2025-11-20',
-    location: 'Melbourne',
-    price: '$80',
-  },
-];
-
 function FeaturedEvents() {
+  const [dbEvents, setDbEvents] = useState([]);
+  const [loadingDbEvents, setLoadingDbEvents] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/events')
+      .then(res => res.json())
+      .then(data => {
+        console.log('Fetched DB events:', data);
+        setDbEvents(data);
+        setLoadingDbEvents(false);
+      })
+      .catch(err => {
+        console.error('Error fetching events from DB:', err);
+        setLoadingDbEvents(false);
+      });
+  }, []);
+
   return (
-    <div className="featured-events-container">
-      {featuredEvents.map((event) => (
-        <div key={event.id} className="event-card">
-          <h3>{event.title}</h3>
-          <p>{event.date}</p>
-          <p>{event.location}</p>
-          <p>{event.price}</p>
-        </div>
-      ))}
+    <div className="events-grid">
+          {loadingDbEvents ? (
+            <p>Loading events from DB...</p>
+          ) : dbEvents.length === 0 ? (
+            <p>No events found in DB.</p>
+          ) : (
+            dbEvents.slice(3).map(event => (
+              <EventCard key={event.eventID} event={event} />
+            ))
+          )}
     </div>
   );
 }
