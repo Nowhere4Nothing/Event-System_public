@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './Navbar.css';
+import { useNavigate } from 'react-router-dom';
 
 function Navbar() {
     // store list of events from backend
@@ -88,7 +88,7 @@ function Navbar() {
       </form>
 
           {/*Account button*/}
-      <button className="account-button">Account</button>
+      <button className="account-button" onClick={() => navigate('/login')}>Account</button>
 
         {/*Display filtered events */}
         <div className = "event-list">
@@ -98,6 +98,7 @@ function Navbar() {
             {/* Display error message if data fetching fails */}
             {error && <p className="error-message">{error}</p>}
         </div>
+
     </nav>
   );
 }

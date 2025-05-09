@@ -1,0 +1,88 @@
+.login-page {
+    padding: 40px;
+    font-family: 'Neue Haas Grotesk', sans-serif;
+  }
+  
+  .login-title {
+    font-size: 40px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #f95700;
+    text-align: center;
+  }
+  
+  .login-outer-container {
+    max-width: 800px;
+    width: 50%;
+    margin: 0 auto;
+  }
+  
+  .login-box {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+
+  }
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .login-label {
+    font-weight: 600;
+    font-size: 20px;
+    font-family: 'Neue Haas Grotesk', sans-serif;
+    color: #2c2c2c;
+    padding: 10px;;
+  }
+
+  .login-button {
+    background-color: #f95700;
+    color: #fff;
+    padding: 5px 15px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+  }
+
+  .login-footer {
+    margin-top: 20px;
+    padding-left: 10px;
+    font-size: 14px;
+    color: #2c2c2c;
+    text-align: center;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  #account-type {
+      background-color: #f95700;
+      color: #fff;
+      padding: 5px 15px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-align: center;
+      appearance: none;
+  }
