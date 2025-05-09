@@ -16,48 +16,54 @@ function Navbar() {
                 setLoading(false);
             })
             .catch((err) => {
-                console.log('Error fetching events',err);
+                console.log('Error fetching events', err);
                 setLoading(false);
             });
     }, []);
 
-    const handleSearch = (e) => {setSearchTerm(e.target.value);
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
     };
 
     const filterEvents = events.filter(event =>
         event.eventName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  return (
-    <nav className="navbar">
-      <div className="logo">Eventual</div>
+    return (
+        <nav className="navbar">
+            <div className="navbar-left">
+                <div className="logo">Eventual</div>
+            </div>
 
-      <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search for events..."
-          className="search-input"
-          value={searchTerm}
-          onChange={handleSearch}
-        />
-        <button className="search-button" onClick={handleSearch}>
-            Search
-        </button>
-      </div>
+            <div className="navbar-center">
+                <div className="search-container">
+                    <input
+                        type="text"
+                        placeholder="Search for events..."
+                        className="search-input"
+                        value={searchTerm}
+                        onChange={handleSearch}
+                    />
+                    <button className="search-button">
+                        Search
+                    </button>
+                </div>
+            </div>
 
-      <button className="account-button" onClick={() => navigate('/login')}>Account</button>
+            <div className="navbar-right">
+                <button className="account-button" onClick={() => navigate('/login')}>
+                    Account
+                </button>
+            </div>
 
-      <button className="account-button">Account</button>
-
-        {/*Display filtered events */}
-        <div className = "event-list">
-            {filterEvents.map((event) => (
-                <div key={event.eventName}></div>
-            ))}
-        </div>
-
-    </nav>
-  );
+            {/* Display filtered events */}
+            <div className="event-list">
+                {filterEvents.map((event) => (
+                    <div key={event.eventName}></div>
+                ))}
+            </div>
+        </nav>
+    );
 }
 
 export default Navbar;
