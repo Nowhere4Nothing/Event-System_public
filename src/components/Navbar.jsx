@@ -35,6 +35,7 @@ function Navbar() {
             } finally {
                 // this will run after teh try or catch block stopping the loading indicator
                 setLoading(false);
+
             }
         })();
     }, []);
@@ -46,6 +47,7 @@ function Navbar() {
             Triggered when user types in search bar
             updates search team and resets the error message
              */
+
     };
 
     const handleSearchSubmit = (e) => {
@@ -101,6 +103,7 @@ function Navbar() {
 
     </nav>
   );
+
 }
 
 export default Navbar;
