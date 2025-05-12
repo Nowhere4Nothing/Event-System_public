@@ -9,10 +9,11 @@
   position: relative;
 }
 
-.navbar-left .logo {
+.logo {
   font-weight: 700;
   font-size: 1.8rem;
   color: #f95700;
+  cursor: pointer;
 }
 
 
