@@ -34,6 +34,27 @@ app.get('/events', (req, res) => {
   });
 });
 
+app.get('/users', (req, res) => {
+  const query = `
+    SELECT 
+      User.username,
+      User.password,
+      User.userType,
+      User.email,
+      User.address,
+      User.phone
+    FROM User
+  `;
+
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      console.error('Error fetching users:', err.message);
+      return res.status(500).json({ error: 'Failed to fetch users' });
+    }
+    res.json(rows);
+  });
+});
+
 app.listen(5000, () => {
   console.log('Server running on http://localhost:5000');
 });
