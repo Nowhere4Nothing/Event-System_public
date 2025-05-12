@@ -1,0 +1,61 @@
+.ticket-details-page {
+  padding: 40px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.ticket-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #f95700;
+}
+
+.ticket-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.event-details-section,
+.ticket-details-section {
+  flex: 1;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.event-details-section h2,
+.ticket-details-section h2 {
+  margin-bottom: 20px;
+  color: #f95700;
+}
+
+.event-details-section p,
+.ticket-details-section p {
+  margin: 10px 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.event-details-section p strong,
+.ticket-details-section p strong {
+  color: #f95700;
+}
+
+.refund-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #f95700;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.refund-button:hover {
+  background-color: #e04e00;
+}

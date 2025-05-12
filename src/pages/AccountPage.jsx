@@ -108,7 +108,7 @@ function AccountPage() {
 
         {/* Booked/Organized events Section */}
         <div className="events-section">
-          <h2>My {userDetails.accountType == "Guest" ? (<span>Booked</span>) : (<span>Organized</span>)} Events </h2>
+          <h2>My {userDetails.accountType === "Guest" ? (<span>Booked</span>) : (<span>Organized</span>)} Events </h2>
           {loadingDbEvents ? (
             <p>Loading events from DB...</p>
           ) : dbEvents.length === 0 ? (
