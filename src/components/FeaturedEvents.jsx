@@ -21,7 +21,7 @@ function FeaturedEvents() {
   }, []);
 
   return (
-    <div className="events-grid">
+    <div className="events-grid" id="event-card">
           {loadingDbEvents ? (
             <p>Loading events from DB...</p>
           ) : dbEvents.length === 0 ? (
