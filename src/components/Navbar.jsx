@@ -69,7 +69,7 @@ function Navbar() {
 
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
-      <div className="logo" aria-label="Eventual home">
+      <div className="logo" aria-label="Eventual home" onClick={() => navigate('/')}>
           Eventual</div>
 
         {/*Searching input field*/}

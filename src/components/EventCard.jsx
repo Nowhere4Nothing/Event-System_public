@@ -11,7 +11,7 @@ function EventCard({ event }) {
   };
 
   return (
-    <div className="event-card" onClick={handleClick} style={{ cursor: 'pointer' }}>
+    <div className="event-card" onClick={handleClick} style={{ cursor: 'pointer' }} data-testid="event-card">
       <h3>{event.eventName}</h3>
       <p>{event.eventDesc}</p>
       <p>Date: {event.eventDate}</p>
