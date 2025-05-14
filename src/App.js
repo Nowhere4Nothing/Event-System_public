@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import AccountPage from './pages/AccountPage';
 import TicketDetails from './pages/TicketDetails';
 import BookingDetails from './pages/BookingDetails';
+import CreateEvent from './pages/CreateEvent';
 
 function App() {
   return (
@@ -18,7 +19,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/ticket/:id" element={<TicketDetails />} />
-        <Route path="/bookings/:id" element={<BookingDetails />} /> 
+        <Route path="/bookings/:id" element={<BookingDetails />} />
+        <Route path="/create" element={<CreateEvent />} /> 
       </Routes>
     </Router>
   );
