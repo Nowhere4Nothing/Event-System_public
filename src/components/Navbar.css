@@ -9,10 +9,21 @@
   position: relative;
 }
 
-.navbar-left .logo {
-  font-weight: 700;
-  font-size: 1.8rem;
+@font-face {
+  font-family: 'HeadingNow';
+  src: url('../assets/fonts/HeadingNowTrial-46Bold.ttf') format('truetype');
+}
+
+.logo {
+  font-size: 70px;
   color: #f95700;
+  font-family: 'HeadingNow', sans-serif;
+}
+
+.logo img{
+  width: 200px;
+  height: auto;
+
 }
 
 
