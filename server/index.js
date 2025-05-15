@@ -69,6 +69,28 @@ app.get('/events/:id', (req, res) => {
   });
 });
 
+app.get('/users', (req, res) => {
+  const query = `
+    SELECT 
+      User.username,
+      User.password,
+      User.userType,
+      User.email,
+      User.address,
+      User.phone
+    FROM User
+  `;
+
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      console.error('Error fetching users:', err.message);
+      return res.status(500).json({ error: 'Failed to fetch users' });
+    }
+    res.json(rows);
+  });
+});
+
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

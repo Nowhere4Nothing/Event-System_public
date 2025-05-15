@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
 import './AccountPage.css';
 import EventBar from '../components/EventBar';
 
 function AccountPage() {
+  const [cookies, setCookies, removeCookies] = useCookies(['userCookie']);
   const [userDetails, setUserDetails] = useState({
     username: 'johndoe',
     email: 'johndoe@example.com',
@@ -10,7 +12,7 @@ function AccountPage() {
     phone: '123-456-7890',
     accountType: 'Guest', // or 'Organizer'
   });
-
+  
   const [isEditing, setIsEditing] = useState(false);
 
   const handleInputChange = (e) => {
@@ -41,14 +43,27 @@ function AccountPage() {
         console.error('Error fetching events from DB:', err);
         setLoadingDbEvents(false);
       });
+    
+    setUserDetails({
+      username: cookies.userCookie.username,
+      email: cookies.userCookie.email,
+      address: cookies.userCookie.address,
+      phone: cookies.userCookie.phone,
+      accountType: cookies.userCookie.userType
+    })
+
   }, []);
+
+  function handleLogout() {
+    removeCookies('userCookie', { path: '/' });
+    window.location.href = '/login';
+  }
 
   return (
     <div className="account-page">
       <h1 className="account-title">My Account</h1>
 
       <div className="account-content">
-        {/* User Details Section */}
         <div className="user-details-section">
           <h2>Account Details</h2>
           {isEditing ? (
@@ -102,11 +117,11 @@ function AccountPage() {
               <p><strong>Phone:</strong> {userDetails.phone}</p>
               <p><strong>Account Type:</strong> {userDetails.accountType}</p>
               <button onClick={() => setIsEditing(true)}>Edit</button>
+              <button onClick={() => handleLogout()}>Logout</button>
             </div>
           )}
         </div>
 
-        {/* Booked/Organized events Section */}
         <div className="events-section">
           <h2>My {userDetails.accountType === "Guest" ? (<span>Booked</span>) : (<span>Organized</span>)} Events </h2>
           {loadingDbEvents ? (
@@ -114,7 +129,7 @@ function AccountPage() {
           ) : dbEvents.length === 0 ? (
             <p>No events found in DB.</p>
           ) : (
-            dbEvents.slice(3).map(event => (
+            dbEvents.map(event => (
               <EventBar key={event.eventID} event={event} />
             ))
           )}

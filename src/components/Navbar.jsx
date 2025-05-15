@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCookies } from 'react-cookie';
 import './Navbar.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,6 +14,7 @@ function Navbar() {
     const [error, setError] = useState(false);
     // able to use the navigate function
     const navigate = useNavigate();
+    const [cookies] = useCookies(['userCookie']);
 
     // use effect to fetch events from the backend API when the component mounts
     useEffect(() => {
@@ -97,8 +99,11 @@ function Navbar() {
       </form>
 
           {/*Account button*/}
-      <button className="account-button" onClick={() => navigate('/login')}>Account</button>
-
+      {cookies.userCookie ? (
+        <button className="account-button" onClick={() => navigate('/account')}>Account</button>
+      ) : (
+        <button className="account-button" onClick={() => navigate('/login')}>Login</button>
+        )}
         {/*Display filtered events */}
         <div className = "event-list">
             {/* Display loading message while fetching data */}
