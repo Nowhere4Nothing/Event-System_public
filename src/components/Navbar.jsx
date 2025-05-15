@@ -26,7 +26,7 @@ function Navbar() {
                     // transforming into a new object
                     id: event.eventID,
                     name: event.eventName,
-                    genre: event.type,
+                    genre: event.eventType,
                     day: event.eventDate
                 }));
                     // updating the state
@@ -60,7 +60,7 @@ function Navbar() {
             event?.id?.toLowerCase() === search ||
             event?.name.toLowerCase() === search ||
             event?.genre.toLowerCase() === search ||
-            event?.day.toLowerCase() === search 
+            event?.day.toLowerCase() === search
         );
 
         if (matchedEvent) {
