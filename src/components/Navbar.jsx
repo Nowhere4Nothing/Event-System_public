@@ -26,8 +26,10 @@ function Navbar() {
                 //processing the data
                 const formattedEvents = data.map((event, index) => ({
                     // transforming into a new object
-                    id: index,
+                    id: event.eventID,
                     name: event.eventName,
+                    genre: event.eventType,
+                    day: event.eventDate
                 }));
                     // updating the state
                     setEvents(formattedEvents);
@@ -54,15 +56,20 @@ function Navbar() {
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        const matchedEvent = events.find(
-            (event) =>
-                // cycle through the event array and return the first event that matches
-                event.name.toLowerCase() === searchTerm.trim().toLowerCase()
+        const search = searchTerm.trim().toLowerCase();
+        console.log("events:", events);
+        const matchedEvent = events.find((event) =>
+            event?.id?.toLowerCase() === search ||
+            event?.name.toLowerCase() === search ||
+            event?.genre.toLowerCase() === search ||
+            event?.day.toLowerCase() === search
         );
+
         if (matchedEvent) {
             // go to this page if matches
-            navigate(`/events/${matchedEvent.name}`);
+            navigate(`/events/${matchedEvent.id}`);
         } else {
+            console.log("matched event = ", matchedEvent);
             setError(true);
         }
     };
@@ -86,7 +93,7 @@ function Navbar() {
           aria-label="Search for events"
         />
 
-        <button type="submit" className="search-button">
+        <button type="submit" className="search-button" onClick={handleSearchSubmit}>
             Search
         </button>
       </form>
@@ -105,6 +112,12 @@ function Navbar() {
             {/* Display error message if data fetching fails */}
             {error && <p className="error-message">{error}</p>}
         </div>
+
+        {error && (
+            <div style={{ color: "red", marginTop: "10px" }}>
+                Event not found. Please check the spelling or try another event.
+            </div>
+        )}
 
     </nav>
   );
