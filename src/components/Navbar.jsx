@@ -26,6 +26,8 @@ function Navbar() {
                     // transforming into a new object
                     id: event.eventID,
                     name: event.eventName,
+                    genre: event.type,
+                    day: event.eventDate
                 }));
                     // updating the state
                     setEvents(formattedEvents);
@@ -56,7 +58,9 @@ function Navbar() {
         console.log("events:", events);
         const matchedEvent = events.find((event) =>
             event?.id?.toLowerCase() === search ||
-            event?.name.toLowerCase() === search
+            event?.name.toLowerCase() === search ||
+            event?.genre.toLowerCase() === search ||
+            event?.day.toLowerCase() === search 
         );
 
         if (matchedEvent) {
