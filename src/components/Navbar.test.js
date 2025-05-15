@@ -1,24 +1,123 @@
-import { render, screen } from '@testing-library/react';
-import {useNavigate} from "react-router-dom";
+import {render, screen, fireEvent, waitFor} from '@testing-library/react';
+import {BrowserRouter} from "react-router-dom";
+import { CookiesProvider } from 'react-cookie';
 import Navbar from "./Navbar";
-import '@testing-library/jest-dom'; 
+import '@testing-library/jest-dom';
 
+// creating a mock function to track usage
+const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
-    useNavigate: jest.fn(),  // Use the mocked navigate function
+    useNavigate: () => mockNavigate,
 }));
 
 describe('Navbar', () => {
-    let navigate;
 
+    // getting the mock calls from the database
     beforeEach(() => {
-        navigate = useNavigate();
-        // navigate.mockClear();
-    })
-
-    test('renders Navbar', () => {
-        render(<Navbar />);
-        expect(screen.getByText('Eventual')).toBeInTheDocument()
+        mockNavigate.mockClear();
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () =>
+                    Promise.resolve([
+                        {
+                            eventID: 'concert123',
+                            eventName: 'Rock Night',
+                            eventType: 'Music',
+                            eventDate: '2025-05-20',
+                        },
+                    ]),
+            })
+        );
     });
+
+    // first test to see that everything renders on the screen
+    test('renders Navbar', () => {
+       render(
+        <CookiesProvider>
+            <Navbar />
+        </CookiesProvider>
+    );
+
+       // Expect the home link to be in the document
+        const logo = screen.getByLabelText('Eventual')
+        expect(logo).toBeInTheDocument();
+
+        //finding the accessible label describing the logos purpose
+        const logoAccess = screen.getByLabelText('Eventual home');
+        expect(logoAccess).toBeInTheDocument();
+
+        // Search input renders on screen
+        const searchInputTestBox = screen.getByPlaceholderText('Search for events...');
+        expect(searchInputTestBox).toBeInTheDocument();
+
+        // Search button & input renders on screen
+        const searchButton =
+            screen.screen.getByTestId('search-button');
+        expect(searchButton).toBeInTheDocument();
+        const searchInput =
+            screen.screen.getByTestId('search-input');
+        expect(searchInput).toBeInTheDocument();
+
+        // Login button renders on screen
+        const loginButton =
+            screen.getByTestId('login-button');
+        expect(loginButton).toBeInTheDocument();
+    });
+
+    // second test to test the buttons call the correct area of teh database
+    test('Search and login button is clicked', async () => {
+        render(
+            <BrowserRouter>
+                <CookiesProvider>
+                    <Navbar />
+                </CookiesProvider>
+            </BrowserRouter>
+        );
+
+        await waitFor(() => {
+            // Wait for search input to have value or for some event to appear
+            // if this line is not here it would fire the mocks below before and
+            // would return an empty string
+            expect(screen.getByTestId('search-input')).toBeInTheDocument();
+        });
+
+        // getting the ids to button and search bar
+        const searchInput = screen.getByTestId('search-input');
+        const searchButton = screen.getByTestId('search-button');
+
+        // stimulation the search with input concert123
+        fireEvent.change(searchInput, { target: { value: 'concert123' } });
+        // stimulate pressing search
+        fireEvent.click(searchButton);
+
+        console.log("Mock: ", mockNavigate.mock.calls);
+
+        // waiting for the reply and going to the correct address
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith('/events/concert123');
+        });
+
+        // second test with event name
+        fireEvent.change(searchInput, { target: { value: 'Rock Night' } });
+        // stimulate pressing search
+        fireEvent.click(searchButton);
+
+        console.log("Mock: ", mockNavigate.mock.calls);
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith('/events/concert123');
+        });
+
+        // finding the login button
+        const loginButton =
+            screen.getByTestId('login-button');
+
+        // Simulate clicking login button
+        fireEvent.click(loginButton);
+
+        console.log("Mock login button: ", mockNavigate.mock.calls);
+        expect(mockNavigate).toHaveBeenCalledWith('/login');
+    })
 });
