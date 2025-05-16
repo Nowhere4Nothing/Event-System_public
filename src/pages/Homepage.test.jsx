@@ -2,6 +2,28 @@ import React from "react";
 import { render, screen, waitFor } from '@testing-library/react';
 import Home from './Home';
 
+async function WhatShouldBeOnScreen() {
+
+    // tests to make sure everything renders on the screen
+    expect(await screen.findByTestId("home-page")).toBeInTheDocument();
+    expect(await screen.findByTestId('categories')).toBeInTheDocument();
+
+    // Rendering teh text
+    expect(await screen.findByText(/Upcoming Events/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Featured Events/i)).toBeInTheDocument();
+
+    expect(await screen.findByTestId('create-account-button')).toBeInTheDocument();
+
+    // showing the details fetched from the database
+    expect(await screen.findByTestId("upcoming-section")).toBeInTheDocument();
+    expect(await screen.findByTestId("upcoming-grid")).toBeInTheDocument();
+    expect(await screen.findByTestId('upcoming-events')).toBeInTheDocument();
+
+    expect(await screen.findByTestId("featured-section")).toBeInTheDocument();
+    expect(await screen.findByTestId("featured-grid")).toBeInTheDocument();
+    expect(await screen.findByTestId('featured-events')).toBeInTheDocument();
+}
+
 // Mock the cat components so it does not load the component code, making tests faster.
 jest.mock('../components/Categories', () => () => <div data-testid="categories" />)
 jest.mock('../components/UpcomingEvents', () => () => <div data-testid="upcoming-events" />)
@@ -28,29 +50,13 @@ test("renders without crashing", async () => {
 
     await waitFor(() => expect(global.fetch).toHaveBeenCalled());
 
-    // tests to make sure everything renders on the screen
-    expect(screen.getByTestId("home-page")).toBeInTheDocument();
-    expect(screen.getByTestId('categories')).toBeInTheDocument();
-
-    // Rendering teh text
-    expect(screen.getByText(/Upcoming Events/i)).toBeInTheDocument();
-    expect(screen.getByText(/Featured Events/i)).toBeInTheDocument();
-
-    expect(screen.getByTestId('create-account-button')).toBeInTheDocument();
 
     await waitFor(() => {
         // waiting for the database to be called before the rest is shown on screen
         expect(fetch).toHaveBeenCalledWith('http://localhost:5000/events');
     });
 
-    // showing the details fetched from the database
-    expect(screen.getByTestId("upcoming-section")).toBeInTheDocument();
-    expect(screen.getByTestId("upcoming-grid")).toBeInTheDocument();
-    expect(screen.getByTestId('upcoming-events')).toBeInTheDocument();
-
-    expect(screen.getByTestId("featured-section")).toBeInTheDocument();
-    expect(screen.getByTestId("featured-grid")).toBeInTheDocument();
-    expect(screen.getByTestId('featured-events')).toBeInTheDocument();
+    await WhatShouldBeOnScreen();
 });
 
 test('error handling database down', async () => {
@@ -63,13 +69,6 @@ test('error handling database down', async () => {
         expect(fetch).toHaveBeenCalledWith('http://localhost:5000/events');
     });
 
-    // the compents that will load even if fetch fails
-    expect(screen.getByTestId("home-page")).toBeInTheDocument();
-    expect(screen.getByTestId('categories')).toBeInTheDocument();
-
-    // Rendering teh text
-    expect(screen.getByText(/Upcoming Events/i)).toBeInTheDocument();
-    expect(screen.getByText(/Featured Events/i)).toBeInTheDocument();
-
-    expect(screen.getByTestId('create-account-button')).toBeInTheDocument();
+    await WhatShouldBeOnScreen();
 })
+
