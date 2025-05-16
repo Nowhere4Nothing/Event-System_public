@@ -24,7 +24,7 @@ db.serialize(() => {
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS Event (
-    eventID TEXT PRIMARY KEY,
+    eventID INTEGER PRIMARY KEY AUTOINCREMENT,
     eventName TEXT,
     eventType TEXT,
     eventDate DATE,
@@ -36,6 +36,15 @@ db.serialize(() => {
     organiserID TEXT,
     FOREIGN KEY(venueID) REFERENCES Venue(venueID),
     FOREIGN KEY(organiserID) REFERENCES Organiser(username)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS TicketOption (
+    ticketOptionID INTEGER PRIMARY KEY AUTOINCREMENT,
+    eventID TEXT,
+    ticketType TEXT,
+    price REAL,
+    quantity INTEGER,
+    FOREIGN KEY(eventID) REFERENCES Event(eventID)
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS Ticket (
