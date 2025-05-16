@@ -65,6 +65,9 @@ function Navbar() {
             event?.day.toLowerCase() === search
         );
 
+        console.log('search:', search);
+        console.log('matchedEvent:', matchedEvent);
+
         if (matchedEvent) {
             // go to this page if matches
             navigate(`/events/${matchedEvent.id}`);
@@ -90,10 +93,14 @@ function Navbar() {
           className="search-input"
           value={searchTerm}
           onChange={handleSearch}
+          data-testid="search-input"
           aria-label="Search for events"
         />
 
-        <button type="submit" className="search-button" onClick={handleSearchSubmit}>
+        <button type="submit"
+                className="search-button"
+                data-testid="search-button"
+        >
             Search
         </button>
       </form>
@@ -102,7 +109,9 @@ function Navbar() {
       {cookies.userCookie ? (
         <button className="account-button" onClick={() => navigate('/account')}>Account</button>
       ) : (
-        <button className="account-button" onClick={() => navigate('/login')}>Login</button>
+        <button className="account-button"
+                data-testid="login-button"
+                onClick={() => navigate('/login')}>Login</button>
         )}
         {/*Display filtered events */}
         <div className = "event-list">

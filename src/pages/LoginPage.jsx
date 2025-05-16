@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import './LoginPage.css';
+import {useNavigate} from "react-router-dom";
 
 function LoginPage() {
   const [accType, setAccType] = useState('guest');
@@ -13,6 +14,7 @@ function LoginPage() {
   const [dbAccounts, setDbAccounts] = useState([]);
   const [loadingDbAccounts, setLoadingDbAccounts] = useState(true);
   const [cookies, setCookie] = useCookies(['userCookie']);
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -42,7 +44,8 @@ function LoginPage() {
     }
     setErrorMessage('');
     setCookie('userCookie', user, { path: '/' });
-    window.location.href = '/account';
+    // window.location.href = '/account';
+    navigate('/account');
   }
 
   const handleRegister = (e) => {
@@ -120,6 +123,7 @@ function LoginPage() {
               <label className="login-label">Username:</label>
               <input
                 type="text"
+                data-testid="username-input"
                 id="username"
                 name="username"
                 value={username}
@@ -131,14 +135,15 @@ function LoginPage() {
               <input
                 type="password"
                 id="password"
+                data-testid="password-input"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
               <br />
-              {errorMessage && <p className="error-message">{errorMessage}</p>}
-              <button type="submit" className="login-button">Login</button>
+              {errorMessage && <p className="error-message" data-testid="login-error">{errorMessage}</p>}
+              <button type="submit" className="login-button" data-testid="login-button">Login</button>
             </form>
           )}
           <div className="login-footer">

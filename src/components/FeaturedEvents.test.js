@@ -36,9 +36,12 @@ describe('FeaturedEvents', () => {
         // checking for the gaming expo event will render correctly on the screen
     });
 
-    test('renders loading message initially', () => {
+    test('renders loading message initially', async () => {
         render(<FeaturedEvents/>);
-        expect(screen.getByText('Loading events from DB...')).toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(screen.getByText('Loading events from DB...')).toBeInTheDocument();
+        });
         // checking to see if the above text renders on the screen
     });
 
@@ -46,6 +49,7 @@ describe('FeaturedEvents', () => {
         render(<FeaturedEvents/>);
         const eventCard = await screen.findByText('Gaming Expo');
         expect(eventCard).toBeInTheDocument();
+
         // test to see if Gaming expo will render correctly after the fetch completes
     });
 
@@ -53,7 +57,8 @@ describe('FeaturedEvents', () => {
         render(<FeaturedEvents/>);
 
         await waitFor(() => {screen.getAllByTestId('event-card')})
-        const cards = screen.getAllByTestId('event-card');
+
+        const cards = await screen.findAllByTestId('event-card');
         expect(cards).toHaveLength(1);
         // ensures that the correct number of event cards are displayed after the fetch completes.
         // will display one event, specifically gaming expo
