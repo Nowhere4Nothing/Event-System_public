@@ -41,7 +41,7 @@ describe('Navbar', () => {
     );
 
        // Expect the home link to be in the document
-        const logo = screen.getByLabelText('Eventual')
+        const logo = screen.getByLabelText('Eventual home')
         expect(logo).toBeInTheDocument();
 
         //finding the accessible label describing the logos purpose
@@ -54,10 +54,10 @@ describe('Navbar', () => {
 
         // Search button & input renders on screen
         const searchButton =
-            screen.screen.getByTestId('search-button');
+            screen.getByTestId('search-button');
         expect(searchButton).toBeInTheDocument();
         const searchInput =
-            screen.screen.getByTestId('search-input');
+            screen.getByTestId('search-input');
         expect(searchInput).toBeInTheDocument();
 
         // Login button renders on screen
@@ -119,5 +119,37 @@ describe('Navbar', () => {
 
         console.log("Mock login button: ", mockNavigate.mock.calls);
         expect(mockNavigate).toHaveBeenCalledWith('/login');
+    })
+});
+
+describe('Navbar when database is not working', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+
+        // making the fail fetch
+        global.fetch = jest.fn(() => Promise.reject("Shits fucked"));
+    });
+
+    test('shows error when database or search fails', async () => {
+        render(<BrowserRouter>
+                <CookiesProvider>
+                    <Navbar/>
+                </CookiesProvider>
+            </BrowserRouter>
+        );
+
+        // getting the ids to button and search bar
+        const searchInput = screen.getByTestId('search-input');
+        const searchButton = screen.getByTestId('search-button');
+
+        // stimulation the search with input concert123
+        fireEvent.change(searchInput, {target: {value: 'concert123'}});
+        // stimulate pressing search
+        fireEvent.click(searchButton);
+
+        await waitFor(() => {
+            //waiting for the fetch to be called and come back with the error
+            expect(global.fetch).toHaveBeenCalled();
+        });
     })
 });
