@@ -1,5 +1,5 @@
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import {BrowserRouter} from "react-router-dom";
+import {MemoryRouter} from "react-router-dom";
 import { CookiesProvider } from 'react-cookie';
 import Navbar from "./Navbar";
 import '@testing-library/jest-dom';
@@ -67,11 +67,11 @@ describe('Navbar', () => {
     // second test to test the buttons call the correct area of teh database
     test('Search and login button is clicked', async () => {
         render(
-            <BrowserRouter>
+            <MemoryRouter>
                 <CookiesProvider>
                     <Navbar />
                 </CookiesProvider>
-            </BrowserRouter>
+            </MemoryRouter>
         );
 
         await waitFor(() => {
