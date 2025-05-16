@@ -33,7 +33,7 @@ describe('Navbar', () => {
     });
 
     // first test to see that everything renders on the screen
-    test('renders Navbar', () => {
+    test('renders Navbar', async () => {
        render(
         <CookiesProvider>
             <Navbar />
@@ -41,28 +41,26 @@ describe('Navbar', () => {
     );
 
        // Expect the home link to be in the document
-        const logo = screen.getByLabelText('Eventual home')
+        const logo = await screen.findByLabelText('Eventual home')
         expect(logo).toBeInTheDocument();
 
         //finding the accessible label describing the logos purpose
-        const logoAccess = screen.getByLabelText('Eventual home');
+        const logoAccess = await screen.findByLabelText('Eventual home');
         expect(logoAccess).toBeInTheDocument();
 
         // Search input renders on screen
-        const searchInputTestBox = screen.getByPlaceholderText('Search for events...');
+        const searchInputTestBox = await screen.findByPlaceholderText('Search for events...');
         expect(searchInputTestBox).toBeInTheDocument();
 
         // Search button & input renders on screen
-        const searchButton =
-            screen.getByTestId('search-button');
+        const searchButton = await screen.findByTestId('search-button');
         expect(searchButton).toBeInTheDocument();
-        const searchInput =
-            screen.getByTestId('search-input');
+
+        const searchInput = await screen.findByTestId('search-input');
         expect(searchInput).toBeInTheDocument();
 
         // Login button renders on screen
-        const loginButton =
-            screen.getByTestId('login-button');
+        const loginButton = await screen.findByTestId('login-button');
         expect(loginButton).toBeInTheDocument();
     });
 
@@ -84,8 +82,8 @@ describe('Navbar', () => {
         });
 
         // getting the ids to button and search bar
-        const searchInput = screen.getByTestId('search-input');
-        const searchButton = screen.getByTestId('search-button');
+        const searchInput = await screen.findByTestId('search-input');
+        const searchButton = await screen.findByTestId('search-button');
 
         // stimulation the search with input concert123
         fireEvent.change(searchInput, { target: { value: 'concert123' } });
@@ -111,14 +109,17 @@ describe('Navbar', () => {
         });
 
         // finding the login button
-        const loginButton =
-            screen.getByTestId('login-button');
+        const loginButton = await screen.findByTestId('login-button');
 
         // Simulate clicking login button
         fireEvent.click(loginButton);
 
         console.log("Mock login button: ", mockNavigate.mock.calls);
-        expect(mockNavigate).toHaveBeenCalledWith('/login');
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith('/login');
+        })
+
     })
 });
 
@@ -139,8 +140,8 @@ describe('Navbar when database is not working', () => {
         );
 
         // getting the ids to button and search bar
-        const searchInput = screen.getByTestId('search-input');
-        const searchButton = screen.getByTestId('search-button');
+        const searchInput = await screen.findByTestId('search-input');
+        const searchButton = await screen.findByTestId('search-button');
 
         // stimulation the search with input concert123
         fireEvent.change(searchInput, {target: {value: 'concert123'}});
