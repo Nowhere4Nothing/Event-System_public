@@ -132,11 +132,11 @@ describe('Navbar when database is not working', () => {
     });
 
     test('shows error when database or search fails', async () => {
-        render(<BrowserRouter>
+        render(<MemoryRouter>
                 <CookiesProvider>
                     <Navbar/>
                 </CookiesProvider>
-            </BrowserRouter>
+            </MemoryRouter>
         );
 
         // getting the ids to button and search bar

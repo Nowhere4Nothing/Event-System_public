@@ -122,4 +122,4 @@ async function WhatShouldBeOnScreenLoginPage() {
     // "Forgot your password?" text and link
     expect(await screen.findByText(/forgot your password/i)).toBeInTheDocument();
     expect(await screen.findByRole('link', { name: /get in touch/i })).toBeInTheDocument();
-};
+}
