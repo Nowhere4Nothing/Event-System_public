@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import './Navbar.css';
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/images/logo.png';
 
 function Navbar() {
     // store list of events from backend
@@ -79,8 +80,10 @@ function Navbar() {
 
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
-      <div className="logo" aria-label="Eventual home" onClick={() => navigate('/')}>
-          Eventual</div>
+
+      <div className="logo" aria-label="Eventual home">
+        <img src={logo} alt="Logo" onClick={() => navigate('/')}/>
+      </div>
 
         {/*Searching input field*/}
       <form className="search-container" onSubmit={handleSearchSubmit}>
