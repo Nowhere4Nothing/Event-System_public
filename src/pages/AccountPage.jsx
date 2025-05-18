@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import './AccountPage.css';
 import EventBar from '../components/EventBar';
+import CreateEventButton from '../components/CreateEventButton';
 
 function AccountPage() {
   const [cookies, setCookies, removeCookies] = useCookies(['userCookie']);
@@ -10,7 +11,7 @@ function AccountPage() {
     email: 'johndoe@example.com',
     address: '123 Main St',
     phone: '123-456-7890',
-    accountType: 'Guest', // or 'Organizer'
+    accountType: 'Guest', // or 'Organiser'
   });
   
   const [isEditing, setIsEditing] = useState(false);
@@ -123,7 +124,10 @@ function AccountPage() {
         </div>
 
         <div className="events-section">
-          <h2>My {userDetails.accountType === "Guest" ? (<span>Booked</span>) : (<span>Organized</span>)} Events </h2>
+          <div className="events-header">
+            <h2>My {userDetails.accountType === "Guest" ? (<span>Booked</span>) : (<span>Organized</span>)} Events</h2>
+            {userDetails.accountType === "organiser" ? (<span className='event-button-holder'><CreateEventButton /></span>) : (<span></span>)}
+          </div>
           {loadingDbEvents ? (
             <p>Loading events from DB...</p>
           ) : dbEvents.length === 0 ? (

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Categories from '../components/Categories';
 import UpcomingEvents from '../components/UpcomingEvents';
 import FeaturedEvents from '../components/FeaturedEvents';
-import CreateAccountButton from '../components/CreateEventButton';
 import './Home.css';
 
 function Home() {
@@ -44,7 +43,6 @@ function Home() {
           <FeaturedEvents  data-testid="featured-events" />
         </div>
       </section>
-      <CreateAccountButton data-cy="create-account-button" />
     </div>
   );
 }

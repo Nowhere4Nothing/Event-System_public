@@ -66,3 +66,19 @@
   .user-details-display button:hover {
     background-color: #e04e00;
   }
+
+  .event-button-holder {
+    display: flex; 
+    justify-content: right;
+  }
+
+  .events-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.events-header h2 {
+  margin: 0;
+}
