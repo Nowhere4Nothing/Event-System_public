@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Categories from '../components/Categories';
 import UpcomingEvents from '../components/UpcomingEvents';
 import FeaturedEvents from '../components/FeaturedEvents';
+import CreateAccountButton from '../components/CreateEventButton';
 import './Home.css';
 
 function Home() {
@@ -23,22 +24,27 @@ function Home() {
   }, []);
 
   return (
-    <div className="home-page">
-      <Categories />
+    <div className="home-page" data-testid="home-page">
+      <Categories data-testid="categories" />
 
-      <section className="events-section">
-        <h2 className="section-heading">Upcoming Events</h2>
-        <div className="events-grid">
-          <UpcomingEvents />
+      <section className="events-section" data-testid="upcoming-section">
+        <h2 className="section-heading">
+            Upcoming Events
+        </h2>
+        <div className="events-grid" data-testid="upcoming-grid">
+          <UpcomingEvents data-testid="upcoming-events" />
         </div>
       </section>
 
-      <section className="events-section">
-        <h2 className="section-heading">Featured Events</h2>
-        <div className="events-grid">
-          <FeaturedEvents />
+      <section className="events-section" data-testid="featured-section">
+        <h2 className="section-heading">
+            Featured Events
+        </h2>
+        <div className="events-grid" data-testid="featured-grid">
+          <FeaturedEvents  data-testid="featured-events" />
         </div>
       </section>
+      <CreateAccountButton data-cy="create-account-button" />
     </div>
   );
 }

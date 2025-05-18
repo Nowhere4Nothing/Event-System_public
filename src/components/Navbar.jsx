@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCookies } from 'react-cookie';
 import './Navbar.css';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo.png';
@@ -14,6 +15,7 @@ function Navbar() {
     const [error, setError] = useState(false);
     // able to use the navigate function
     const navigate = useNavigate();
+    const [cookies] = useCookies(['userCookie']);
 
     // use effect to fetch events from the backend API when the component mounts
     useEffect(() => {
@@ -25,8 +27,10 @@ function Navbar() {
                 //processing the data
                 const formattedEvents = data.map((event, index) => ({
                     // transforming into a new object
-                    id: index,
+                    id: event.eventID,
                     name: event.eventName,
+                    genre: event.eventType,
+                    day: event.eventDate
                 }));
                     // updating the state
                     setEvents(formattedEvents);
@@ -53,21 +57,30 @@ function Navbar() {
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        const matchedEvent = events.find(
-            (event) =>
-                // cycle through the event array and return the first event that matches
-                event.name.toLowerCase() === searchTerm.trim().toLowerCase()
+        const search = searchTerm.trim().toLowerCase();
+        console.log("events:", events);
+        const matchedEvent = events.find((event) =>
+            event?.id?.toLowerCase() === search ||
+            event?.name.toLowerCase() === search ||
+            event?.genre.toLowerCase() === search ||
+            event?.day.toLowerCase() === search
         );
+
+        console.log('search:', search);
+        console.log('matchedEvent:', matchedEvent);
+
         if (matchedEvent) {
             // go to this page if matches
-            navigate(`/events/${matchedEvent.name}`);
+            navigate(`/events/${matchedEvent.id}`);
         } else {
+            console.log("matched event = ", matchedEvent);
             setError(true);
         }
     };
 
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
+
       <div className="logo" aria-label="Eventual home">
         <img src={logo} alt="Logo" onClick={() => navigate('/')}/>
       </div>
@@ -83,17 +96,26 @@ function Navbar() {
           className="search-input"
           value={searchTerm}
           onChange={handleSearch}
+          data-testid="search-input"
           aria-label="Search for events"
         />
 
-        <button type="submit" className="search-button">
+        <button type="submit"
+                className="search-button"
+                data-testid="search-button"
+        >
             Search
         </button>
       </form>
 
           {/*Account button*/}
-      <button className="account-button" onClick={() => navigate('/login')}>Account</button>
-
+      {cookies.userCookie ? (
+        <button className="account-button" onClick={() => navigate('/account')}>Account</button>
+      ) : (
+        <button className="account-button"
+                data-testid="login-button"
+                onClick={() => navigate('/login')}>Login</button>
+        )}
         {/*Display filtered events */}
         <div className = "event-list">
             {/* Display loading message while fetching data */}
@@ -102,6 +124,12 @@ function Navbar() {
             {/* Display error message if data fetching fails */}
             {error && <p className="error-message">{error}</p>}
         </div>
+
+        {error && (
+            <div style={{ color: "red", marginTop: "10px" }}>
+                Event not found. Please check the spelling or try another event.
+            </div>
+        )}
 
     </nav>
   );

@@ -1,14 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useCookies } from 'react-cookie';
 import './LoginPage.css';
+import {useNavigate} from "react-router-dom";
 
 function LoginPage() {
   const [accType, setAccType] = useState('guest');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [dbAccounts, setDbAccounts] = useState([]);
+  const [loadingDbAccounts, setLoadingDbAccounts] = useState(true);
+  const [cookies, setCookie] = useCookies(['userCookie']);
+  const navigate = useNavigate();
 
-  const handleRegisterSubmit = (e) => {
+
+  useEffect(() => {
+    fetch('http://localhost:5000/users') 
+    .then(res => res.json())
+    .then(data => {
+      console.log('Fetched user details:', data);
+      setLoadingDbAccounts(false);
+      setDbAccounts(data);
+    })
+    .catch(err => {
+      console.error('Error fetching user details from DB:', err);
+    });
+
+  }, []);
+
+  function handleLogin(e) {
+    e.preventDefault();
+    if(loadingDbAccounts) {
+      console.log('Login attempted before accounts loaded');
+      return;
+    }
+    const user = dbAccounts.find((user) => user.username === username && user.password === password);
+    if (!user) {
+      setErrorMessage('Invalid username or password!');
+      return;
+    }
+    setErrorMessage('');
+    setCookie('userCookie', user, { path: '/' });
+    // window.location.href = '/account';
+    navigate('/account');
+  }
+
+  const handleRegister = (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setErrorMessage('Passwords do not match!');
@@ -24,12 +64,26 @@ function LoginPage() {
           <h1 className="login-title">{isRegistering ? 'Register' : 'Login'}</h1>
           {isRegistering ? (
             // Registration Form
-            <form className="login-form" onSubmit={handleRegisterSubmit}>
+            <form className="login-form" onSubmit={handleRegister}>
               <label className="login-label">Username:</label>
-              <input type="text" id="username" name="username" required />
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
               <br />
               <label className="login-label">Email:</label>
-              <input type="email" id="email" name="email" required />
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+              />
               <br />
               <label className="login-label">Password:</label>
               <input
@@ -65,14 +119,31 @@ function LoginPage() {
             </form>
           ) : (
             // Login Form
-            <form className="login-form">
+            <form className="login-form" onSubmit={handleLogin}>
               <label className="login-label">Username:</label>
-              <input type="text" id="username" name="username" required />
+              <input
+                type="text"
+                data-testid="username-input"
+                id="username"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
               <br />
               <label className="login-label">Password:</label>
-              <input type="password" id="password" name="password" required />
+              <input
+                type="password"
+                id="password"
+                data-testid="password-input"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
               <br />
-              <button type="submit" className="login-button">Login</button>
+              {errorMessage && <p className="error-message" data-testid="login-error">{errorMessage}</p>}
+              <button type="submit" className="login-button" data-testid="login-button">Login</button>
             </form>
           )}
           <div className="login-footer">
