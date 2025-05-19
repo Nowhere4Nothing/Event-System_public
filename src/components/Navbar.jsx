@@ -60,7 +60,7 @@ function Navbar() {
         const search = searchTerm.trim().toLowerCase();
         console.log("events:", events);
         const matchedEvent = events.find((event) =>
-            event?.id?.toLowerCase() === search ||
+            String(event?.id) === search ||
             event?.name.toLowerCase() === search ||
             event?.genre.toLowerCase() === search ||
             event?.day.toLowerCase() === search

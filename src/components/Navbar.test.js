@@ -22,7 +22,7 @@ describe('Navbar', () => {
                 json: () =>
                     Promise.resolve([
                         {
-                            eventID: 'concert123',
+                            eventID: 1,
                             eventName: 'Rock Night',
                             eventType: 'Music',
                             eventDate: '2025-05-20',
@@ -39,6 +39,7 @@ describe('Navbar', () => {
             <Navbar />
         </CookiesProvider>
     );
+
 
        // Expect the home link to be in the document
         const logo = await screen.findByLabelText('Eventual home')
@@ -86,7 +87,7 @@ describe('Navbar', () => {
         const searchButton = await screen.findByTestId('search-button');
 
         // stimulation the search with input concert123
-        fireEvent.change(searchInput, { target: { value: 'concert123' } });
+        fireEvent.change(searchInput, { target: { value: 1 } });
         // stimulate pressing search
         fireEvent.click(searchButton);
 
@@ -94,7 +95,7 @@ describe('Navbar', () => {
 
         // waiting for the reply and going to the correct address
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith('/events/concert123');
+            expect(mockNavigate).toHaveBeenCalledWith('/events/1');
         });
 
         // second test with event name
@@ -105,7 +106,7 @@ describe('Navbar', () => {
         console.log("Mock: ", mockNavigate.mock.calls);
 
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith('/events/concert123');
+            expect(mockNavigate).toHaveBeenCalledWith('/events/1');
         });
 
         // finding the login button
@@ -144,7 +145,7 @@ describe('Navbar when database is not working', () => {
         const searchButton = await screen.findByTestId('search-button');
 
         // stimulation the search with input concert123
-        fireEvent.change(searchInput, {target: {value: 'concert123'}});
+        fireEvent.change(searchInput, {target: {value: 1}});
         // stimulate pressing search
         fireEvent.click(searchButton);
 

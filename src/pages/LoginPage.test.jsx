@@ -81,7 +81,7 @@ describe("LoginPage", () => {
         fireEvent.change(passwordInput, { target: { value: 'IncorrectPassword' } });
         fireEvent.click(loginButton);
 
-        // ✅ Confirm the error appears
+        // Confirm the error appears
         const errorMessage = await screen.findByTestId('login-error');
         expect(errorMessage).toHaveTextContent(/invalid username or password/i);
     })

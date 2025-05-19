@@ -12,8 +12,6 @@ async function WhatShouldBeOnScreen() {
     expect(await screen.findByText(/Upcoming Events/i)).toBeInTheDocument();
     expect(await screen.findByText(/Featured Events/i)).toBeInTheDocument();
 
-    expect(await screen.findByTestId('create-account-button')).toBeInTheDocument();
-
     // showing the details fetched from the database
     expect(await screen.findByTestId("upcoming-section")).toBeInTheDocument();
     expect(await screen.findByTestId("upcoming-grid")).toBeInTheDocument();
@@ -28,8 +26,6 @@ async function WhatShouldBeOnScreen() {
 jest.mock('../components/Categories', () => () => <div data-testid="categories" />)
 jest.mock('../components/UpcomingEvents', () => () => <div data-testid="upcoming-events" />)
 jest.mock('../components/FeaturedEvents', () => () => <div data-testid="featured-events" />)
-jest.mock('../components/CreateEventButton', () => () => <button data-testid="create-account-button">
-    Create Account</button>);
 
 // happy paths
 beforeEach(() => {
