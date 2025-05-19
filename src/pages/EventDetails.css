@@ -9,6 +9,11 @@
     margin-bottom: 30px;
     color: #f95700;
   }
+
+.event-description {
+  padding: 20px;
+  flex: 1 1 100%;
+}
   
   .event-content {
     display: flex;
