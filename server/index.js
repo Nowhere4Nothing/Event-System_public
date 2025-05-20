@@ -4,12 +4,11 @@ const db = require('./database');
 const app = express();
 const PORT = 5000;
 
-const cors = require('cors');
-
 app.use(cors({
   origin: 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type'],
+  credentials: true
 }));
 
 app.use(express.json());

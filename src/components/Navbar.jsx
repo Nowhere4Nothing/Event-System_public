@@ -22,7 +22,7 @@ function Navbar() {
         (async () => {
             try {
                 // fetching the date from the database
-                const res = await fetch('http://localhost:5000/events');
+                const res = await fetch('http://localhost:5000/events', {credentials: 'include'});
                 const data = await res.json();
                 //processing the data
                 const formattedEvents = data.map((event, index) => ({
