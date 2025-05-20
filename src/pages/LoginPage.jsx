@@ -18,7 +18,7 @@ function LoginPage() {
 
 
   useEffect(() => {
-    fetch('http://localhost:5000/users') 
+    fetch('http://localhost:5000/users', {credentials: 'include'}) 
     .then(res => res.json())
     .then(data => {
       console.log('Fetched user details:', data);

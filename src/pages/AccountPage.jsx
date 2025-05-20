@@ -33,7 +33,7 @@ function AccountPage() {
   const [loadingDbEvents, setLoadingDbEvents] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/events')
+    fetch('http://localhost:5000/events', {credentials: 'include',})
       .then(res => res.json())
       .then(data => {
         console.log('Fetched DB events:', data);

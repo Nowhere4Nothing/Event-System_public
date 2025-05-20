@@ -13,7 +13,7 @@ function EventDetails() {
     const fetchEvent = async () => {
       try {
         console.log(`[EventDetails] Fetching event with ID: ${id}`);
-        const response = await fetch(`http://localhost:5000/events/${id}`);
+        const response = await fetch(`http://localhost:5000/events/${id}`, {credentials: 'include'});
         if (!response.ok) {
           console.error(`[EventDetails] Failed to fetch event. Status: ${response.status}`);
           throw new Error('Event not found');

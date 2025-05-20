@@ -61,7 +61,8 @@ const CreateEvent = () => {
   fetch('http://localhost:5000/events', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(completeData)
+    body: JSON.stringify(completeData),
+    credentials: 'include',
   })
     .then(res => res.json())
     .then(data => {
@@ -75,7 +76,8 @@ const CreateEvent = () => {
   fetch('http://localhost:5000/ticketOptions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(ticketOptions)
+    body: JSON.stringify(ticketOptions),
+    credentials: 'include'
   })
     .then(res => res.json())
     .then(data => {
