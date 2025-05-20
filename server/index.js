@@ -4,7 +4,14 @@ const db = require('./database');
 const app = express();
 const PORT = 5000;
 
-app.use(cors());
+const cors = require('cors');
+
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type']
+}));
+
 app.use(express.json());
 
 app.get('/venues', (req, res) => {
