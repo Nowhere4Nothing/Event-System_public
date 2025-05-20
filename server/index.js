@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const db = require('./database'); // Your SQLite3 connection
+const db = require('./database');
 const app = express();
 const PORT = 5000;
 
@@ -8,279 +8,248 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/venues', (req, res) => {
-  const query = `
-    SELECT
-      Venue.venueID,
-      Venue.venueName,
-      Venue.capacity
-    FROM Venue
-  `;
-  
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      console.error('Error fetching venues:', err.message);
-      return res.status(500).json({ error: 'Failed to fetch venues' });
-    }
+  try {
+    const query = `
+      SELECT
+        Venue.venueID,
+        Venue.venueName,
+        Venue.capacity
+      FROM Venue
+    `;
+    const rows = db.prepare(query).all();
     res.json(rows);
-  });
+  } catch (err) {
+    console.error('Error fetching venues:', err.message);
+    res.status(500).json({ error: 'Failed to fetch venues' });
+  }
 });
 
-// Get all events with venue names
 app.get('/events', (req, res) => {
-  const query = `
-    SELECT 
-      Event.eventID,
-      Event.eventName,
-      Event.eventType,
-      Event.eventDate,
-      Event.venueID,
-      Venue.venueName,
-      Event.eventDesc,
-      Event.eventTime,
-      Event.performer,
-      Event.banner,
-      Event.organiserID
-    FROM Event
-    LEFT JOIN Venue ON Event.venueID = Venue.venueID
-  `;
-
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      console.error('Error fetching events:', err.message);
-      return res.status(500).json({ error: 'Failed to fetch events' });
-    }
+  try {
+    const query = `
+      SELECT 
+        Event.eventID,
+        Event.eventName,
+        Event.eventType,
+        Event.eventDate,
+        Event.venueID,
+        Venue.venueName,
+        Event.eventDesc,
+        Event.eventTime,
+        Event.performer,
+        Event.banner,
+        Event.organiserID
+      FROM Event
+      LEFT JOIN Venue ON Event.venueID = Venue.venueID
+    `;
+    const rows = db.prepare(query).all();
     res.json(rows);
-  });
+  } catch (err) {
+    console.error('Error fetching events:', err.message);
+    res.status(500).json({ error: 'Failed to fetch events' });
+  }
 });
 
-// Get single event by ID (for EventDetails.jsx)
 app.get('/events/:id', (req, res) => {
-  const eventId = req.params.id;
-
-  const query = `
-    SELECT 
-      Event.eventID,
-      Event.eventName,
-      Event.eventType,
-      Event.eventDate,
-      Event.venueID,
-      Venue.venueName,
-      Event.eventDesc,
-      Event.eventTime,
-      Event.performer,
-      Event.banner,
-      Event.organiserID
-    FROM Event
-    LEFT JOIN Venue ON Event.venueID = Venue.venueID
-    WHERE Event.eventID = ?
-  `;
-
-  db.get(query, [eventId], (err, row) => {
-    if (err) {
-      console.error('Error fetching event by ID:', err.message);
-      return res.status(500).json({ error: 'Failed to fetch event' });
-    }
+  try {
+    const eventId = req.params.id;
+    const query = `
+      SELECT 
+        Event.eventID,
+        Event.eventName,
+        Event.eventType,
+        Event.eventDate,
+        Event.venueID,
+        Venue.venueName,
+        Event.eventDesc,
+        Event.eventTime,
+        Event.performer,
+        Event.banner,
+        Event.organiserID
+      FROM Event
+      LEFT JOIN Venue ON Event.venueID = Venue.venueID
+      WHERE Event.eventID = ?
+    `;
+    const row = db.prepare(query).get(eventId);
     if (!row) {
       return res.status(404).json({ error: 'Event not found' });
     }
     res.json(row);
-  });
+  } catch (err) {
+    console.error('Error fetching event by ID:', err.message);
+    res.status(500).json({ error: 'Failed to fetch event' });
+  }
 });
 
-// Create a new event
 app.post('/events', (req, res) => {
-  const {
-    eventName,
-    eventType,
-    eventDate,
-    venueID,
-    eventDesc,
-    eventTime,
-    performer,
-    banner,
-    organiserID
-  } = req.body;
+  try {
+    const {
+      eventName,
+      eventType,
+      eventDate,
+      venueID,
+      eventDesc,
+      eventTime,
+      performer,
+      banner,
+      organiserID
+    } = req.body;
 
-  const query = `
-    INSERT INTO Event (
+    const query = `
+      INSERT INTO Event (
+        eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const result = db.prepare(query).run(
       eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  db.run(
-    query,
-    [eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID],
-    function (err) {
-      if (err) {
-        console.error('Error creating event:', err.message);
-        return res.status(500).json({ error: 'Failed to create event' });
-      }
-      res.status(201).json({ eventID: this.lastID });
-    }
-  );
+    );
+    res.status(201).json({ eventID: result.lastInsertRowid });
+  } catch (err) {
+    console.error('Error creating event:', err.message);
+    res.status(500).json({ error: 'Failed to create event' });
+  }
 });
 
-// Update specific event
 app.put('/events/:id', (req, res) => {
-  const eventId = req.params.id;
-  const {
-    eventName,
-    eventType,
-    eventDate,
-    venueID,
-    eventDesc,
-    eventTime,
-    performer,
-    banner,
-    organiserID
-  } = req.body;
+  try {
+    const eventId = req.params.id;
+    const {
+      eventName,
+      eventType,
+      eventDate,
+      venueID,
+      eventDesc,
+      eventTime,
+      performer,
+      banner,
+      organiserID
+    } = req.body;
 
-  const query = `
-    UPDATE Event SET
-      eventName = ?,
-      eventType = ?,
-      eventDate = ?,
-      venueID = ?,
-      eventDesc = ?,
-      eventTime = ?,
-      performer = ?,
-      banner = ?,
-      organiserID = ?
-    WHERE eventID = ?
-  `;
-
-  db.run(
-    query,
-    [eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID, eventId],
-    function (err) {
-      if (err) {
-        console.error('Error updating event:', err.message);
-        return res.status(500).json({ error: 'Failed to update event' });
-      }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Event not found' });
-      }
-      res.json({ message: 'Event updated successfully' });
+    const query = `
+      UPDATE Event SET
+        eventName = ?,
+        eventType = ?,
+        eventDate = ?,
+        venueID = ?,
+        eventDesc = ?,
+        eventTime = ?,
+        performer = ?,
+        banner = ?,
+        organiserID = ?
+      WHERE eventID = ?
+    `;
+    const result = db.prepare(query).run(
+      eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID, eventId
+    );
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Event not found' });
     }
-  );
+    res.json({ message: 'Event updated successfully' });
+  } catch (err) {
+    console.error('Error updating event:', err.message);
+    res.status(500).json({ error: 'Failed to update event' });
+  }
 });
 
 app.get('/ticketOptions', (req, res) => {
-  const query = `
-    SELECT 
-      TicketOption.ticketOptionID,
-      TicketOption.eventID,
-      TicketOption.ticketType,
-      TicketOption.price,
-      TicketOption.quantity
-    FROM TicketOption
-  `;
-
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      console.error('Error fetching ticket options:', err.message);
-      return res.status(500).json({ error: 'Failed to fetch ticket options' });
-    }
+  try {
+    const query = `
+      SELECT 
+        TicketOption.ticketOptionID,
+        TicketOption.eventID,
+        TicketOption.ticketType,
+        TicketOption.price,
+        TicketOption.quantity
+      FROM TicketOption
+    `;
+    const rows = db.prepare(query).all();
     res.json(rows);
-  });
+  } catch (err) {
+    console.error('Error fetching ticket options:', err.message);
+    res.status(500).json({ error: 'Failed to fetch ticket options' });
+  }
 });
 
 app.get('/ticketOptions/:eventID', (req, res) => {
-  const eventId = req.params.eventID;
-
-  const query = `
-    SELECT 
-      TicketOption.ticketOptionID,
-      TicketOption.eventID,
-      TicketOption.ticketType,
-      TicketOption.price,
-      TicketOption.quantity
-    FROM TicketOption
-    WHERE eventID = ?
-  `;
-
-  db.all(query, [eventId], (err, rows) => {
-    if (err) {
-      console.error('Error fetching ticket options for event:', err.message);
-      return res.status(500).json({ error: 'Failed to fetch ticket options' });
-    }
+  try {
+    const eventId = req.params.eventID;
+    const query = `
+      SELECT 
+        TicketOption.ticketOptionID,
+        TicketOption.eventID,
+        TicketOption.ticketType,
+        TicketOption.price,
+        TicketOption.quantity
+      FROM TicketOption
+      WHERE eventID = ?
+    `;
+    const rows = db.prepare(query).all(eventId);
     res.json(rows);
-  });
+  } catch (err) {
+    console.error('Error fetching ticket options for event:', err.message);
+    res.status(500).json({ error: 'Failed to fetch ticket options' });
+  }
 });
 
 app.post('/ticketOptions', (req, res) => {
-  const { eventID, ticketType, price, quantity } = req.body;
-
-  const query = `
-    INSERT INTO TicketOption (eventID, ticketType, price, quantity)
-    VALUES (?, ?, ?, ?)
-  `;
-
-  db.run(
-    query,
-    [eventID, ticketType, price, quantity],
-    function (err) {
-      if (err) {
-        console.error('Error creating ticket option:', err.message);
-        return res.status(500).json({ error: 'Failed to create ticket option' });
-      }
-      res.status(201).json({ ticketOptionID: this.lastID });
-    }
-  );
+  try {
+    const { eventID, ticketType, price, quantity } = req.body;
+    const query = `
+      INSERT INTO TicketOption (eventID, ticketType, price, quantity)
+      VALUES (?, ?, ?, ?)
+    `;
+    const result = db.prepare(query).run(eventID, ticketType, price, quantity);
+    res.status(201).json({ ticketOptionID: result.lastInsertRowid });
+  } catch (err) {
+    console.error('Error creating ticket option:', err.message);
+    res.status(500).json({ error: 'Failed to create ticket option' });
+  }
 });
 
 app.put('/ticketOptions/:id', (req, res) => {
-  const ticketOptionId = req.params.id;
-  const { eventID, ticketType, price, quantity } = req.body;
+  try {
+    const ticketOptionId = req.params.id;
+    const { eventID, ticketType, price, quantity } = req.body;
 
-  const query = `
-    UPDATE TicketOption SET
-      eventID = ?,
-      ticketType = ?,
-      price = ?,
-      quantity = ?
-    WHERE ticketOptionID = ?
-  `;
-
-  db.run(
-    query,
-    [eventID, ticketType, price, quantity, ticketOptionId],
-    function (err) {
-      if (err) {
-        console.error('Error updating ticket option:', err.message);
-        return res.status(500).json({ error: 'Failed to update ticket option' });
-      }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Ticket option not found' });
-      }
-      res.json({ message: 'Ticket option updated successfully' });
+    const query = `
+      UPDATE TicketOption SET
+        eventID = ?,
+        ticketType = ?,
+        price = ?,
+        quantity = ?
+      WHERE ticketOptionID = ?
+    `;
+    const result = db.prepare(query).run(eventID, ticketType, price, quantity, ticketOptionId);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Ticket option not found' });
     }
-  );
+    res.json({ message: 'Ticket option updated successfully' });
+  } catch (err) {
+    console.error('Error updating ticket option:', err.message);
+    res.status(500).json({ error: 'Failed to update ticket option' });
+  }
 });
 
 app.get('/users', (req, res) => {
-  const query = `
-    SELECT 
-      User.username,
-      User.password,
-      User.userType,
-      User.email,
-      User.address,
-      User.phone
-    FROM User
-  `;
-
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      console.error('Error fetching users:', err.message);
-      return res.status(500).json({ error: 'Failed to fetch users' });
-    }
+  try {
+    const query = `
+      SELECT 
+        User.username,
+        User.password,
+        User.userType,
+        User.email,
+        User.address,
+        User.phone
+      FROM User
+    `;
+    const rows = db.prepare(query).all();
     res.json(rows);
-  });
+  } catch (err) {
+    console.error('Error fetching users:', err.message);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
 });
 
-
-// Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
