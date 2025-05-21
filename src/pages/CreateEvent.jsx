@@ -89,7 +89,7 @@ const CreateEvent = () => {
 };
 
   useEffect(() => {
-    if(cookies.userCookie && cookies.userCookie.userType === 'organiser') {
+    if(cookies.userCookie && cookies.userCookie.userType === 'Organiser') {
       setUser(cookies.userCookie.username)
     } else {
       navigate('/login'); // If they somehow get to the create events page while logged out (or not an organiser), kick them back to login

@@ -21,7 +21,7 @@ const tableStatements = [
     capacity INTEGER
   )`,
   `CREATE TABLE IF NOT EXISTS Event (
-    eventID TEXT PRIMARY KEY,
+    eventID INTEGER PRIMARY KEY AUTOINCREMENT,
     eventName TEXT,
     eventType TEXT,
     eventDate DATE,
@@ -33,6 +33,14 @@ const tableStatements = [
     organiserID TEXT,
     FOREIGN KEY(venueID) REFERENCES Venue(venueID),
     FOREIGN KEY(organiserID) REFERENCES Organiser(username)
+  )`,
+  `CREATE TABLE IF NOT EXISTS TicketOption (
+    ticketOptionID INTEGER PRIMARY KEY AUTOINCREMENT,
+    eventID TEXT,
+    ticketType TEXT,
+    price REAL,
+    quantity INTEGER,
+    FOREIGN KEY(eventID) REFERENCES Event(eventID)
   )`,
   `CREATE TABLE IF NOT EXISTS Ticket (
     ticketID TEXT PRIMARY KEY,
