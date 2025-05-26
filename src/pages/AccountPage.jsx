@@ -126,7 +126,7 @@ function AccountPage() {
         <div className="events-section">
           <div className="events-header">
             <h2>My {userDetails.accountType === "Guest" ? (<span>Booked</span>) : (<span>Organized</span>)} Events</h2>
-            {userDetails.accountType === "organiser" ? (<span className='event-button-holder'><CreateEventButton /></span>) : (<span></span>)}
+            {userDetails.accountType === "Organiser" ? (<span className='event-button-holder'><CreateEventButton /></span>) : (<span></span>)}
           </div>
           {loadingDbEvents ? (
             <p>Loading events from DB...</p>

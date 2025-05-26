@@ -14,7 +14,9 @@ db.prepare(`
 // Insert organiser user
 db.prepare(`
   INSERT INTO User (username, password, userType, email, address, phone) 
-  VALUES ('organiser1', 'pass123', 'organiser', 'org1@example.com', '123 Main St', '123456789')
+  VALUES 
+    ('organiser1', 'pass123', 'Organiser', 'org1@example.com', '123 Main St', '123456789'),
+    ('user1', 'pass123', 'Guest', 'guest1@example.com', '456 Elm St', '987654321')
 `).run();
 
 db.prepare(`
