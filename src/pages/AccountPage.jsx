@@ -11,10 +11,30 @@ function AccountPage() {
     email: 'johndoe@example.com',
     address: '123 Main St',
     phone: '123-456-7890',
-    accountType: 'Guest', // or 'Organiser'
+    userType: 'Guest', // or 'Organiser'
   });
-  
+  const [oldUsername, setOldUsername] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  
+  // password edit
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const startEdit = (e) => {
+    setIsEditing(true);
+    setOldUsername(userDetails.username);
+  }
+
+  const cancelEdit = (e) => {
+    setIsEditing(false);
+    setIsChangingPassword(false);
+    setNewPassword('');
+    setConfirmPassword('');
+    setPasswordError('');
+    loadDetailsFromCookie();
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,7 +46,21 @@ function AccountPage() {
 
   const handleSave = () => {
     setIsEditing(false);
-    // SQLLite integration will go here
+    fetch('http://localhost:5000/users/' + oldUsername, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userDetails),
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('User details updated:', data);
+        setCookies('userCookie', userDetails, { path: '/' });
+      })
+      .catch(err => {
+        console.error('Error updating user details:', err);
+      });
   };
 
   const [dbEvents, setDbEvents] = useState([]);
@@ -45,19 +79,56 @@ function AccountPage() {
         setLoadingDbEvents(false);
       });
     
+    loadDetailsFromCookie();
+
+  }, []);
+
+  function loadDetailsFromCookie() {
     setUserDetails({
       username: cookies.userCookie.username,
       email: cookies.userCookie.email,
       address: cookies.userCookie.address,
       phone: cookies.userCookie.phone,
-      accountType: cookies.userCookie.userType
-    })
-
-  }, []);
+      userType: cookies.userCookie.userType
+    })  
+  }
 
   function handleLogout() {
     removeCookies('userCookie', { path: '/' });
     window.location.href = '/login';
+  }
+
+  function startPasswordChange() {
+    setIsChangingPassword(true);
+    setNewPassword('');
+    setConfirmPassword('');
+    setPasswordError('');
+  }
+
+  function savePasswordChange() {
+    if(newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match!');
+      return;
+    }
+    setPasswordError('');
+    fetch('http://localhost:5000/passwords/' + oldUsername, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password: newPassword }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('Password updated:', data);
+        setIsChangingPassword(false);
+        setNewPassword('');
+        setConfirmPassword('');
+      })
+      .catch(err => {
+        console.error('Error updating password:', err);
+      });
+      cancelEdit(); //not actually cancelling but it exits the form so w/e
   }
 
   return (
@@ -68,56 +139,93 @@ function AccountPage() {
         <div className="user-details-section">
           <h2>Account Details</h2>
           {isEditing ? (
-            <form className="user-details-form">
-              <label>
-                Username:
-                <input
-                  type="text"
-                  name="username"
-                  value={userDetails.username}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Email:
-                <input
-                  type="email"
-                  name="email"
-                  value={userDetails.email}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Address:
-                <input
-                  type="text"
-                  name="address"
-                  value={userDetails.address}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Phone:
-                <input
-                  type="text"
-                  name="phone"
-                  value={userDetails.phone}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <p><strong>Account Type:</strong> {userDetails.accountType}</p>
-              <button type="button" onClick={handleSave}>
-                Save
-              </button>
-            </form>
+            isChangingPassword ? (
+              <form className="user-details-form">
+                <label>
+                  New Password:
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                  />
+                </label>
+                <label>
+                  Confirm Password:
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                  />
+                </label>
+                {passwordError && <p className="error-message">{passwordError}</p>}
+                <button type="button" onClick={savePasswordChange}>
+                  Save
+                </button>
+                <button type="button" onClick={cancelEdit}>
+                  Cancel
+                </button>
+              </form>
+            ) : (
+              <form className="user-details-form">
+                <label>
+                  Username:
+                  <input
+                    type="text"
+                    name="username"
+                    value={userDetails.username}
+                    onChange={handleInputChange}
+                  />
+                </label>
+                <label>
+                  Email:
+                  <input
+                    type="email"
+                    name="email"
+                    value={userDetails.email}
+                    onChange={handleInputChange}
+                  />
+                </label>
+                <label>
+                  Address:
+                  <input
+                    type="text"
+                    name="address"
+                    value={userDetails.address}
+                    onChange={handleInputChange}
+                  />
+                </label>
+                <label>
+                  Phone:
+                  <input
+                    type="text"
+                    name="phone"
+                    value={userDetails.phone}
+                    onChange={handleInputChange}
+                  />
+                </label>
+                <p><strong>Account Type:</strong> {userDetails.userType}</p>
+                <button type="button" onClick={handleSave}>
+                  Save
+                </button>
+                <button type="button" onClick={cancelEdit}>
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={startPasswordChange}
+                >
+                  Change password
+                </button>
+              </form>
+            )
           ) : (
             <div className="user-details-display">
               <p><strong>Username:</strong> {userDetails.username}</p>
               <p><strong>Email:</strong> {userDetails.email}</p>
               <p><strong>Address:</strong> {userDetails.address}</p>
               <p><strong>Phone:</strong> {userDetails.phone}</p>
-              <p><strong>Account Type:</strong> {userDetails.accountType}</p>
-              <button onClick={() => setIsEditing(true)}>Edit</button>
+              <p><strong>Account Type:</strong> {userDetails.userType}</p>
+              <button onClick={() => startEdit()}>Edit</button>
               <button onClick={() => handleLogout()}>Logout</button>
             </div>
           )}
@@ -125,8 +233,8 @@ function AccountPage() {
 
         <div className="events-section">
           <div className="events-header">
-            <h2>My {userDetails.accountType === "Guest" ? (<span>Booked</span>) : (<span>Organized</span>)} Events</h2>
-            {userDetails.accountType === "Organiser" ? (<span className='event-button-holder'><CreateEventButton /></span>) : (<span></span>)}
+            <h2>My {userDetails.userType === "Guest" ? (<span>Booked</span>) : (<span>Organized</span>)} Events</h2>
+            {userDetails.userType === "Organiser" ? (<span className='event-button-holder'><CreateEventButton /></span>) : (<span></span>)}
           </div>
           {loadingDbEvents ? (
             <p>Loading events from DB...</p>

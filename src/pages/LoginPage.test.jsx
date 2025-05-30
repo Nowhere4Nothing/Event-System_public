@@ -21,7 +21,7 @@ describe("LoginPage", () => {
                             username: 'BobTheBuilder',
                             password: 'password',
                             email: 'bob@example.com',
-                            type: 'guest',
+                            type: 'Guest',
                         },
                     ]),
             })
