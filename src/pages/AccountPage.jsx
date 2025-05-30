@@ -20,7 +20,8 @@ function AccountPage() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  
+  const [errorText, setErrorText] = useState('');
 
   const startEdit = (e) => {
     setIsEditing(true);
@@ -32,7 +33,7 @@ function AccountPage() {
     setIsChangingPassword(false);
     setNewPassword('');
     setConfirmPassword('');
-    setPasswordError('');
+    setErrorText('');
     loadDetailsFromCookie();
   }
 
@@ -44,7 +45,21 @@ function AccountPage() {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (userDetails.username !== oldUsername) {
+    try {
+      const res = await fetch(`http://localhost:5000/users/${userDetails.username}`);
+      if (res.ok) {
+        setErrorText('That username is already taken.');
+        return;
+      }
+    } catch (err) {
+        setErrorText('Woah! Database check failed, try again.');
+        console.error('Error checking username:', err);
+        return;
+    }
+  }
+    setErrorText('');
     setIsEditing(false);
     fetch('http://localhost:5000/users/' + oldUsername, {
       method: 'PUT',
@@ -102,15 +117,15 @@ function AccountPage() {
     setIsChangingPassword(true);
     setNewPassword('');
     setConfirmPassword('');
-    setPasswordError('');
+    setErrorText('');
   }
 
   function savePasswordChange() {
     if(newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match!');
+      setErrorText('Passwords do not match!');
       return;
     }
-    setPasswordError('');
+    setErrorText('');
     fetch('http://localhost:5000/passwords/' + oldUsername, {
       method: 'PUT',
       headers: {
@@ -157,7 +172,7 @@ function AccountPage() {
                     onChange={e => setConfirmPassword(e.target.value)}
                   />
                 </label>
-                {passwordError && <p className="error-message">{passwordError}</p>}
+                {errorText && <p className="error-message">{errorText}</p>}
                 <button type="button" onClick={savePasswordChange}>
                   Save
                 </button>
@@ -204,6 +219,7 @@ function AccountPage() {
                   />
                 </label>
                 <p><strong>Account Type:</strong> {userDetails.userType}</p>
+                {errorText && <p className="error-message">{errorText}</p>}
                 <button type="button" onClick={handleSave}>
                   Save
                 </button>
