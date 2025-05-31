@@ -19,6 +19,7 @@ function LoginPage() {
   const [userAddress, setUserAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [accType, setAccType] = useState('Guest');
+  const [organisationName, setOrganisationName] = useState('');
   
 
 
@@ -98,6 +99,26 @@ function LoginPage() {
         setErrorMessage('Registration failed. Please try again.');
       });
 
+    if(accType == 'Organiser') {
+      const newOrganiser = {
+        username,
+        organisationName
+      };
+      fetch('http://localhost:5000/organisers/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrganiser)
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log('Organiser registered:', data);
+        })
+        .catch(err => {
+          console.error('Error registering organiser:', err);
+          setErrorMessage('Organiser registration failed. Please try again.');
+        });
+    }
+
   };
 
   return (
@@ -176,9 +197,23 @@ function LoginPage() {
                   onChange={(e) => setAccType(e.target.value)}
                 >
                   <option value="Guest">Guest</option>
-                  <option value="Organizer">Organizer</option>
+                  <option value="Organiser">Organiser</option>
                 </select>
               </p>
+                <br />
+                {accType == 'Organiser' ? (
+                <p>
+                  <label className='login-label'>Organisation Name:</label>
+                  <input
+                    type="text"
+                    id="organisation-name"
+                    name="organisation-name"
+                    value={organisationName}
+                    onChange={(e) => setOrganisationName(e.target.value)}
+                    required={accType === 'Organiser'}
+                  />
+                </p>
+                ) : null}
               <button type="submit" className="login-button">Register</button>
             </form>
           ) : (
