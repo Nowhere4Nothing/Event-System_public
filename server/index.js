@@ -256,6 +256,92 @@ app.get('/users', (req, res) => {
   }
 });
 
+app.get('/users/:username', (req, res) => {
+  try {
+    const username = req.params.username;
+    const query = `
+      SELECT
+        User.username,
+        User.password,
+        User.userType,
+        User.email,
+        User.address,
+        User.phone
+      FROM User
+      WHERE User.username = ?
+    `;
+    const row = db.prepare(query).get(username);
+    if (!row) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(row);
+  } catch (err) {
+    console.error('Error fetching user by username:', err.message);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+app.post('/users', (req, res) => {
+  try {
+    const { username, password, userType, email, address, phone } = req.body;
+    const query = `
+      INSERT INTO User (username, password, userType, email, address, phone)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const result = db.prepare(query).run(username, password, userType, email, address, phone);
+    res.status(201).json({ username: result.lastInsertRowid });
+  } catch (err) {
+    console.error('Error creating user:', err.message);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+app.put('/users/:username', (req, res) => {
+  try {
+    const oldUsername = req.params.username;
+    const { username, userType, email, address, phone } = req.body;
+
+    const query = `
+      UPDATE User SET
+        username = ?,
+        userType = ?,
+        email = ?,
+        address = ?,
+        phone = ?
+      WHERE username = ?
+    `;
+    const result = db.prepare(query).run(username, userType, email, address, phone, oldUsername);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ message: 'User updated successfully' });
+  } catch (err) {
+    console.error('Error updating user:', err.message);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+app.put('/passwords/:username', (req, res) => {
+  try {
+    const username = req.params.username;
+    const { password } = req.body;
+
+    const query = `
+      UPDATE User SET
+        password = ?
+      WHERE username = ?
+    `;
+    const result = db.prepare(query).run(password, username);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error('Error updating user password:', err.message);
+    res.status(500).json({ error: 'Failed to update user password' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
