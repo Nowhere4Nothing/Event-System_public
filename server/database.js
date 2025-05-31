@@ -43,8 +43,8 @@ const tableStatements = [
     FOREIGN KEY(eventID) REFERENCES Event(eventID)
   )`,
   `CREATE TABLE IF NOT EXISTS Ticket (
-    ticketID TEXT PRIMARY KEY,
-    eventID TEXT,
+    ticketID INTEGER PRIMARY KEY AUTOINCREMENT,
+    eventID INTEGER,
     username TEXT,
     ticketType TEXT,
     FOREIGN KEY(eventID) REFERENCES Event(eventID),

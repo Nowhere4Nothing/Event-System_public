@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import './AccountPage.css';
 import EventBar from '../components/EventBar';
+import TicketEventBar from '../components/TicketEventBar';
 import CreateEventButton from '../components/CreateEventButton';
 
 function AccountPage() {
@@ -281,8 +282,9 @@ function AccountPage() {
             myDBEvents.map(event => (
               <EventBar key={event.eventID} event={event} />))
             ) : (
-              // ticket bar todo later
-              console.log('placeholder')
+              myDBEvents.map(ticket => (
+              <TicketEventBar key={ticket.ticketID} ticket={ticket} eventID={ticket.eventID} />
+              ))
             )
           )}
 
