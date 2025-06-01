@@ -9,7 +9,7 @@ function Home() {
   const [loadingDbEvents, setLoadingDbEvents] = useState(true);
 
   useEffect(() => {
-    fetch('/events')
+    fetch('http://localhost:5000/events')
       .then(res => res.json())
       .then(data => {
         console.log('Fetched DB events:', data);
