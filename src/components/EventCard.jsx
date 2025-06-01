@@ -1,5 +1,5 @@
 import React from 'react';
-import './EventCard.css'; // Assuming you have styles
+import './EventCard.css';
 import { useNavigate } from 'react-router-dom';
 
 
