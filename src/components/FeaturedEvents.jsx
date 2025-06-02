@@ -7,7 +7,7 @@ function FeaturedEvents() {
   const [loadingDbEvents, setLoadingDbEvents] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/events', {credentials: 'include'})
+    fetch('/events')
       .then(res => res.json())
       .then(data => {
         console.log('Fetched DB events:', data);

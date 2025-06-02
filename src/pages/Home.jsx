@@ -9,7 +9,7 @@ function Home() {
   const [loadingDbEvents, setLoadingDbEvents] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/events', {credentials: 'include'})
+    fetch('http://localhost:5000/events')
       .then(res => res.json())
       .then(data => {
         console.log('Fetched DB events:', data);
@@ -17,7 +17,7 @@ function Home() {
         setLoadingDbEvents(false);
       })
       .catch(err => {
-        console.error('Error fetching events from DB:', err);
+        console.error('Error fetching events from DB:', err.message || err);
         setLoadingDbEvents(false);
       });
   }, []);

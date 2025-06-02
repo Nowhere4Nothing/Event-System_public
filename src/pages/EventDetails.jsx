@@ -5,43 +5,59 @@ import './EventDetails.css';
 function EventDetails() {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
+  const [ticketOptions, setTicketOptions] = useState([]);
+  const [selectedOption, setSelectedOption] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [seatType, setSeatType] = useState('general');
 
+  const handleBuyNow = () => {
+    if (!selectedOption) return;
+
+    const ticketData = {
+      ticketOptionID: selectedOption.ticketOptionID,
+      ticketType: selectedOption.ticketType,
+      quantity: selectedOption.quantity || 1,
+      totalPrice: selectedOption.price * (selectedOption.quantity || 1),
+    };
+
+    console.log('Buying ticket:', ticketData);
+
+  };
+
+  // Fetch event
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        console.log(`[EventDetails] Fetching event with ID: ${id}`);
-        const response = await fetch(`http://localhost:5000/events/${id}`, {credentials: 'include'});
-        if (!response.ok) {
-          console.error(`[EventDetails] Failed to fetch event. Status: ${response.status}`);
-          throw new Error('Event not found');
-        }
+        const response = await fetch(`http://localhost:5000/events/${id}`, { credentials: 'include' });
+        if (!response.ok) throw new Error('Event not found');
         const data = await response.json();
-        console.log('[EventDetails] Event data received:', data);
         setEvent(data);
       } catch (err) {
-        console.error('[EventDetails] Error fetching event:', err.message);
         setError(err.message);
       } finally {
-        console.log('[EventDetails] Fetch complete. Updating loading state to false.');
         setLoading(false);
       }
     };
-
     fetchEvent();
   }, [id]);
 
-  if (loading) {
-    console.log('[EventDetails] Currently loading...');
-    return <p style={{ padding: '2rem', textAlign: 'center' }}>Loading...</p>;
-  }
-
-  if (error || !event) {
-    console.warn('[EventDetails] Displaying error state.');
-    return <p style={{ padding: '2rem', textAlign: 'center' }}>{error || 'Event not found.'}</p>;
-  }
+  // Fetch ticket options
+  useEffect(() => {
+    const fetchTicketOptions = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/ticketOptions/${id}`);
+        if (!res.ok) throw new Error('Failed to fetch ticket options');
+        const data = await res.json();
+        setTicketOptions(data);
+        if (data.length > 0) {
+          setSelectedOption({ ...data[0], quantity: 1 });
+        }
+      } catch (err) {
+        console.error('[TicketOptions] Error:', err);
+      }
+    };
+    fetchTicketOptions();
+  }, [id]);
 
   function formatDateToLocal(dateString) {
     const date = new Date(dateString);
@@ -52,68 +68,89 @@ function EventDetails() {
     });
   }
 
-  console.log('[EventDetails] Rendering event details:', event);
+  if (loading) return <p>Loading...</p>;
+  if (error || !event) return <p>{error || 'Event not found.'}</p>;
 
   return (
-    <div className="event-details-page">
-      <h1 className="event-title">
-        {event.eventName}
-      </h1>
-      <div className="event-description" data-testid="event-description">
-        <p>{event.eventDesc}</p>
-        <p className="event-date" data-testid="event-date">
-          {formatDateToLocal(event.eventDate)}
-        </p>
-        <p className="event-time" data-testid="event-time">
-          {event.eventTime}
-        </p>
+  <div className="event-details-container">
+    <div className="left-pane">
+      <h1 className="event-title">{event.eventName}</h1>
+      <div className="event-description">
+        <p><strong>Description: </strong>{event.eventDesc}</p>
+        <p className="event-date"><strong>Date: </strong>{formatDateToLocal(event.eventDate)}</p>
+        <p className="event-time"><strong>Time: </strong>{event.eventTime}</p>
       </div>
+
       <div className="event-content">
         <div className="ticket-section">
           <h2>Ticket Options</h2>
-          <div className="ticket-option">
-            <strong>Selected:</strong>{' '}
-            {seatType === 'general' && 'General Admission'}
-            {seatType === 'reserved' && 'Reserved Seating'}
-            {seatType === 'vip' && 'VIP Lounge'}
-            <p>{event.price || '$TBD'}</p>
-          </div>
-          <div className="ticket-option">
-            <strong>VIP</strong>
-            <p>+ $50 Upgrade</p>
-          </div>
-          <div className="ticket-total">
-            <strong>Total: {event.total}</strong>
-          </div>
-        </div>
+          {ticketOptions.length === 0 ? (
+            <p>No ticket options available.</p>
+          ) : (
+            <>
+              <div className="seating-selector">
+                <label htmlFor="ticket-type">Choose a ticket type:</label>
+                <select
+                  id="ticket-type"
+                  value={selectedOption?.ticketOptionID || ''}
+                  onChange={(e) => {
+                    const option = ticketOptions.find(opt => opt.ticketOptionID === parseInt(e.target.value));
+                    if (option) {
+                      setSelectedOption({ ...option, quantity: 1 });
+                    }
+                  }}
+                >
+                  {ticketOptions.map(option => (
+                    <option key={option.ticketOptionID} value={option.ticketOptionID}>
+                      {option.ticketType} — ${option.price}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        <div className="seating-section">
-          <h2>Seating Area</h2>
-          <div className="seating-selector">
-            <label htmlFor="seating">Choose a seating type:</label>
-            <select
-              id="seating"
-              value={seatType}
-              onChange={(e) => setSeatType(e.target.value)}
-            >
-              <option value="general">General Admission</option>
-              <option value="reserved">Reserved Seating</option>
-              <option value="vip">VIP Lounge</option>
-            </select>
-          </div>
+              {selectedOption && (
+                <>
+                  <div className="ticket-quantity">
+                    <label htmlFor="ticket-quantity">Quantity:</label>
+                    <select
+                      id="ticket-quantity"
+                      value={selectedOption.quantity || 1}
+                      onChange={(e) => {
+                        const updatedOption = { ...selectedOption, quantity: parseInt(e.target.value) };
+                        setSelectedOption(updatedOption);
+                      }}
+                    >
+                      {[...Array(10)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>{i + 1}</option>
+                      ))}
+                    </select>
+                  </div>
 
-          <div className="ticket-preview">
-            <h3>Selected Seating:</h3>
-            <p>
-              {seatType === 'general' && 'General Admission'}
-              {seatType === 'reserved' && 'Reserved Seating'}
-              {seatType === 'vip' && 'VIP Lounge'}
-            </p>
-          </div>
+                  <div className="ticket-summary">
+                    <p><strong>Selected:</strong> {selectedOption.ticketType}</p>
+                    <p><strong>Total Price:</strong> ${selectedOption.price * (selectedOption.quantity || 1)}</p>
+                  </div>
+                </>
+              )}
+
+              <br/>
+
+              <button className="buy-now-button" onClick={handleBuyNow}>
+                Buy Now
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
-  );
+
+    <div className="right-pane">
+      <img src="/images/event-placeholder.jpg" alt="Event Visual" className="event-image" />
+    </div>
+  </div>
+);
+
+
 }
 
 export default EventDetails;
