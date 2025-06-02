@@ -37,4 +37,11 @@ db.prepare(`
     ('Blockchain Summit 2025', 'Summit', '2025-11-20', 'V006', 'Summit for blockchain tech.', '09:30', '', null, 'organiser1')
 `).run();
 
+db.prepare(`
+  INSERT INTO Ticket (eventID, username, ticketType)
+  VALUES
+    (1, 'user1', 'Standard'),
+    (5, 'user1', 'VIP')
+  `).run();
+
 console.log('Database seeded successfully.');

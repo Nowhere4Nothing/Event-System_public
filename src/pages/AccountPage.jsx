@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import './AccountPage.css';
 import EventBar from '../components/EventBar';
+import TicketEventBar from '../components/TicketEventBar';
 import CreateEventButton from '../components/CreateEventButton';
 
 function AccountPage() {
@@ -78,21 +79,41 @@ function AccountPage() {
       });
   };
 
-  const [dbEvents, setDbEvents] = useState([]);
+  const [myDBEvents, setDbEvents] = useState([]);
   const [loadingDbEvents, setLoadingDbEvents] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/events', {credentials: 'include',})
-      .then(res => res.json())
-      .then(data => {
-        console.log('Fetched DB events:', data);
-        setDbEvents(data);
-        setLoadingDbEvents(false);
-      })
-      .catch(err => {
-        console.error('Error fetching events from DB:', err);
-        setLoadingDbEvents(false);
-      });
+    if(cookies.userCookie === undefined) {
+      window.location.href = '/login'; // login first, bro
+    }
+    if(cookies.userCookie.userType == "Guest") {
+        fetch('http://localhost:5000/tickets/' + cookies.userCookie.username)
+          .then(res => res.json())
+          .then(data => {
+            console.log('Fetched tickets for user:', data);
+            setDbEvents(data);
+            setLoadingDbEvents(false);
+          })
+          .catch(err => {
+            console.error('Error fetching tickets:', err);
+            setLoadingDbEvents(false);
+          });
+    } else if(cookies.userCookie.userType == "Organiser") {
+      fetch('http://localhost:5000/events/organiser/' + cookies.userCookie.username)
+        .then(res => res.json())
+        .then(data => { 
+          console.log('Fetched events for organiser:', data);
+          setDbEvents(data);
+          setLoadingDbEvents(false);
+        })
+        .catch(err => {
+          console.error('Error fetching events:', err);
+          setLoadingDbEvents(false);
+        });
+    } else {
+      console.error('Unknown user type:', cookies.userCookie.userType);
+      setLoadingDbEvents(false);
+    }
     
     loadDetailsFromCookie();
 
@@ -253,14 +274,20 @@ function AccountPage() {
             {userDetails.userType === "Organiser" ? (<span className='event-button-holder'><CreateEventButton /></span>) : (<span></span>)}
           </div>
           {loadingDbEvents ? (
-            <p>Loading events from DB...</p>
-          ) : dbEvents.length === 0 ? (
-            <p>No events found in DB.</p>
+            <p>Loading...</p>
+          ) : myDBEvents.length === 0 ? (
+            <p>No events found!</p>
           ) : (
-            dbEvents.map(event => (
-              <EventBar key={event.eventID} event={event} />
-            ))
+            userDetails.userType == "Organiser" ? (
+            myDBEvents.map(event => (
+              <EventBar key={event.eventID} event={event} />))
+            ) : (
+              myDBEvents.map(ticket => (
+              <TicketEventBar key={ticket.ticketID} ticket={ticket} eventID={ticket.eventID} />
+              ))
+            )
           )}
+
         </div>
       </div>
     </div>

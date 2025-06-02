@@ -87,6 +87,34 @@ app.get('/events/:id', (req, res) => {
   }
 });
 
+app.get('/events/organiser/:organiser', (req, res) => {
+  try {
+    const organiserId = req.params.organiser;
+    const query = `
+      SELECT 
+        Event.eventID,
+        Event.eventName,
+        Event.eventType,
+        Event.eventDate,
+        Event.venueID,
+        Venue.venueName,
+        Event.eventDesc,
+        Event.eventTime,
+        Event.performer,
+        Event.banner,
+        Event.organiserID
+      FROM Event
+      LEFT JOIN Venue ON Event.venueID = Venue.venueID
+      WHERE Event.organiserID = ?
+    `;
+    const rows = db.prepare(query).all(organiserId);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching events by organiser:', err.message);
+    res.status(500).json({ error: 'Failed to fetch events' });
+  }
+});
+
 app.post('/events', (req, res) => {
   try {
     const {
@@ -321,6 +349,22 @@ app.put('/users/:username', (req, res) => {
   }
 });
 
+app.post('/organisers/', (req, res) => {
+  try {
+    const { username, organisationName } = req.body;
+
+    const query = `
+      INSERT INTO Organiser (username, organisationName)
+      VALUES (?, ?)
+    `;
+    const result = db.prepare(query).run(username, organisationName);
+    res.status(201).json({ message: 'Organiser created successfully', organiserID: result.lastInsertRowid });
+  } catch (err) {
+    console.error('Error creating organiser:', err.message);
+    res.status(500).json({ error: 'Failed to create organiser' });
+  }
+});
+
 app.put('/passwords/:username', (req, res) => {
   try {
     const username = req.params.username;
@@ -341,6 +385,29 @@ app.put('/passwords/:username', (req, res) => {
     res.status(500).json({ error: 'Failed to update user password' });
   }
 });
+
+app.get('/tickets/:username', (req, res) => {
+  try {
+    const username = req.params.username;
+    const query = `
+      SELECT 
+        Ticket.ticketID,
+        Ticket.eventID,
+        Ticket.ticketType,
+        Event.eventName,
+        Event.eventDate
+      FROM Ticket
+      LEFT JOIN Event ON Ticket.eventID = Event.eventID
+      WHERE Ticket.username = ?
+    `;
+    const rows = db.prepare(query).all(username);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching tickets for user:', err.message);
+    res.status(500).json({ error: 'Failed to fetch tickets' });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
