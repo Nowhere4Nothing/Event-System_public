@@ -10,6 +10,8 @@
     "better-sqlite3": "^11.10.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "jsbarcode": "^3.11.6",
+    "jspdf": "^3.0.1",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.1.0",
