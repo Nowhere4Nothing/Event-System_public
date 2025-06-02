@@ -10,6 +10,20 @@ function EventDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleBuyNow = () => {
+    if (!selectedOption) return;
+
+    const ticketData = {
+      ticketOptionID: selectedOption.ticketOptionID,
+      ticketType: selectedOption.ticketType,
+      quantity: selectedOption.quantity || 1,
+      totalPrice: selectedOption.price * (selectedOption.quantity || 1),
+    };
+
+    console.log('Buying ticket:', ticketData);
+
+  };
+
   // Fetch event
   useEffect(() => {
     const fetchEvent = async () => {
@@ -35,7 +49,9 @@ function EventDetails() {
         if (!res.ok) throw new Error('Failed to fetch ticket options');
         const data = await res.json();
         setTicketOptions(data);
-        if (data.length > 0) setSelectedOption(data[0]); // Default selection
+        if (data.length > 0) {
+          setSelectedOption({ ...data[0], quantity: 1 });
+        }
       } catch (err) {
         console.error('[TicketOptions] Error:', err);
       }
@@ -56,12 +72,13 @@ function EventDetails() {
   if (error || !event) return <p>{error || 'Event not found.'}</p>;
 
   return (
-    <div className="event-details-page">
+  <div className="event-details-container">
+    <div className="left-pane">
       <h1 className="event-title">{event.eventName}</h1>
       <div className="event-description">
-        <p>{event.eventDesc}</p>
-        <p className="event-date">{formatDateToLocal(event.eventDate)}</p>
-        <p className="event-time">{event.eventTime}</p>
+        <p><strong>Description: </strong>{event.eventDesc}</p>
+        <p className="event-date"><strong>Date: </strong>{formatDateToLocal(event.eventDate)}</p>
+        <p className="event-time"><strong>Time: </strong>{event.eventTime}</p>
       </div>
 
       <div className="event-content">
@@ -78,7 +95,9 @@ function EventDetails() {
                   value={selectedOption?.ticketOptionID || ''}
                   onChange={(e) => {
                     const option = ticketOptions.find(opt => opt.ticketOptionID === parseInt(e.target.value));
-                    setSelectedOption(option);
+                    if (option) {
+                      setSelectedOption({ ...option, quantity: 1 });
+                    }
                   }}
                 >
                   {ticketOptions.map(option => (
@@ -90,17 +109,48 @@ function EventDetails() {
               </div>
 
               {selectedOption && (
-                <div className="ticket-summary">
-                  <p><strong>Selected:</strong> {selectedOption.ticketType}</p>
-                  <p><strong>Price:</strong> ${selectedOption.price}</p>
-                </div>
+                <>
+                  <div className="ticket-quantity">
+                    <label htmlFor="ticket-quantity">Quantity:</label>
+                    <select
+                      id="ticket-quantity"
+                      value={selectedOption.quantity || 1}
+                      onChange={(e) => {
+                        const updatedOption = { ...selectedOption, quantity: parseInt(e.target.value) };
+                        setSelectedOption(updatedOption);
+                      }}
+                    >
+                      {[...Array(10)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>{i + 1}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="ticket-summary">
+                    <p><strong>Selected:</strong> {selectedOption.ticketType}</p>
+                    <p><strong>Total Price:</strong> ${selectedOption.price * (selectedOption.quantity || 1)}</p>
+                  </div>
+                </>
               )}
+
+              <br/>
+
+              <button className="buy-now-button" onClick={handleBuyNow}>
+                Buy Now
+              </button>
             </>
           )}
         </div>
       </div>
     </div>
-  );
+
+    <div className="right-pane">
+      <img src="/images/event-placeholder.jpg" alt="Event Visual" className="event-image" />
+    </div>
+  </div>
+);
+
+
 }
 
 export default EventDetails;
