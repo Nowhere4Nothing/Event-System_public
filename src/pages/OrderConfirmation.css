@@ -1,0 +1,59 @@
+.order-confirmation-container {
+  padding: 40px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: 'Neue Haas Grotesk', sans-serif;
+  color: #2c2c2c;
+}
+
+.order-confirmation-container h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #f95700;
+}
+
+.order-confirmation-container p {
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+.ticket-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 800px;        
+  margin: 30px auto;       
+  padding: 30px 40px;      
+  background: #fff;
+  border-radius: 16px;     
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  font-size: 1.1rem;       
+  transition: transform 0.2s ease;
+}
+
+.ticket-item:hover {
+  transform: scale(1.01); 
+}
+
+.ticket-info {
+  flex: 1;
+  padding-right: 20px;
+}
+
+.view-ticket-button {
+  background-color: #d34700;
+  color: white;
+  padding: 12px 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.view-ticket-button:hover {
+  background-color: #b93d00;
+}

@@ -10,15 +10,29 @@ db.prepare('DELETE FROM Venue').run();
 db.prepare('DELETE FROM User').run();
 
 // Insert venues
-db.prepare(`
-  INSERT INTO Venue (venueID, venueName, capacity) VALUES 
-    ('V001', 'Sydney Conference Hall', 300),
-    ('V002', 'Melbourne Startup Hub', 200),
-    ('V003', 'Brisbane Arts Center', 150),
-    ('V004', 'Online Platform', 1000),
-    ('V005', 'Sydney Tech Arena', 500),
-    ('V006', 'Melbourne Blockchain Venue', 250)
-`).run();
+const fs = require('fs');
+const path = require('path');
+
+const venues = [
+  { id: 'V001', name: 'Sydney Conference Hall', capacity: 300, image: 'venue1.png' },
+  { id: 'V002', name: 'Melbourne Startup Hub', capacity: 200, image: 'venue2.png' },
+  { id: 'V003', name: 'Brisbane Arts Center', capacity: 150, image: 'venue3.png' },
+  { id: 'V004', name: 'Online Platform', capacity: 1000, image: 'venue4.png' },
+  { id: 'V005', name: 'Sydney Tech Arena', capacity: 500, image: 'venue5.png' },
+  { id: 'V006', name: 'Melbourne Blockchain Venue', capacity: 250, image: 'venue6.png' },
+];
+
+const insertVenue = db.prepare(`
+  INSERT INTO Venue (venueID, venueName, capacity, venueImage)
+  VALUES (?, ?, ?, ?)
+`);
+
+for (const venue of venues) {
+  const imagePath = path.join(__dirname, '..', 'src', 'assets', 'images', venue.image);
+  const imageBuffer = fs.readFileSync(imagePath);
+  insertVenue.run(venue.id, venue.name, venue.capacity, imageBuffer);
+}
+
 
 // Insert organiser user
 db.prepare(`
@@ -73,6 +87,9 @@ db.prepare(`INSERT INTO TicketOption (eventID, ticketType, price, quantity) VALU
 db.prepare(`INSERT INTO TicketOption (eventID, ticketType, price, quantity) VALUES (?, ?, ?, ?)`).run(6, 'Standard Pass', 70.00, 180);
 db.prepare(`INSERT INTO TicketOption (eventID, ticketType, price, quantity) VALUES (?, ?, ?, ?)`).run(6, 'Developer Pass', 90.00, 100);
 db.prepare(`INSERT INTO TicketOption (eventID, ticketType, price, quantity) VALUES (?, ?, ?, ?)`).run(6, 'Investor VIP', 200.00, 20);
+
+
+//insert image
 
 
 console.log('Database seeded successfully.');

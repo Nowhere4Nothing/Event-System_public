@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './EventDetails.css';
 
 function EventDetails() {
@@ -9,22 +9,59 @@ function EventDetails() {
   const [selectedOption, setSelectedOption] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const handleBuyNow = () => {
+
+  const handleBuyNow = async () => {
     if (!selectedOption) return;
 
-    const ticketData = {
-      ticketOptionID: selectedOption.ticketOptionID,
-      ticketType: selectedOption.ticketType,
-      quantity: selectedOption.quantity || 1,
-      totalPrice: selectedOption.price * (selectedOption.quantity || 1),
+    const cookieValue = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('userCookie='))
+      ?.split('=')[1];
+
+    if (!cookieValue) {
+      alert('User not logged in.');
+      return;
+    }
+
+    const userCookie = JSON.parse(decodeURIComponent(cookieValue));
+
+    const payload = {
+      eventID: event.eventID,
+      username: userCookie.username,
+      tickets: [
+        {
+          ticketOptionID: selectedOption.ticketOptionID,
+          quantity: selectedOption.quantity,
+        }
+      ],
     };
 
-    console.log('Buying ticket:', ticketData);
+    console.log('Payload being sent:', JSON.stringify(payload));
 
-  };
+    try {
+      const res = await fetch('http://localhost:5000/purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        credentials: 'include',
+      });
 
-  // Fetch event
+      const result = await res.json();
+      if (res.ok) {
+        navigate(`/order-confirmation/${result.paymentID}`);      
+      } else {
+        alert('Purchase failed: ' + result.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('An error occurred during purchase.');
+    }
+};
+
+
+  //fetch event
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -41,7 +78,7 @@ function EventDetails() {
     fetchEvent();
   }, [id]);
 
-  // Fetch ticket options
+  //fetch ticket options
   useEffect(() => {
     const fetchTicketOptions = async () => {
       try {
@@ -145,10 +182,10 @@ function EventDetails() {
     </div>
 
     <div className="right-pane">
-      <img src="/images/event-placeholder.jpg" alt="Event Visual" className="event-image" />
+      <img src={event.venueImage} alt="Event Visual" className="event-image" />
     </div>
   </div>
-);
+  );
 
 
 }
