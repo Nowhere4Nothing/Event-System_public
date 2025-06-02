@@ -180,7 +180,7 @@ function EventDetails() {
     </div>
 
     <div className="right-pane">
-      <img src="/images/event-placeholder.jpg" alt="Event Visual" className="event-image" />
+      <img src={event.venueImage} alt="Event Visual" className="event-image" />
     </div>
   </div>
   );

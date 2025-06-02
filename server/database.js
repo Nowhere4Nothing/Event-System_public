@@ -18,7 +18,8 @@ const tableStatements = [
   `CREATE TABLE IF NOT EXISTS Venue (
     venueID TEXT PRIMARY KEY,
     venueName TEXT,
-    capacity INTEGER
+    capacity INTEGER,
+    venueImage BLOB
   )`,
   `CREATE TABLE IF NOT EXISTS Event (
     eventID INTEGER PRIMARY KEY AUTOINCREMENT,

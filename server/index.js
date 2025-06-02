@@ -23,7 +23,8 @@ app.get('/venues', (req, res) => {
       SELECT
         Venue.venueID,
         Venue.venueName,
-        Venue.capacity
+        Venue.capacity,
+        Venue.venueImage
       FROM Venue
     `;
     const rows = db.prepare(query).all();
@@ -94,6 +95,8 @@ app.get('/events/:id', (req, res) => {
   try {
     const eventId = req.params.id;
 
+    const row = db.prepare('SELECT venueImage FROM Venue WHERE venueID = ?').get('V001');
+
     const eventQuery = `
       SELECT 
         Event.eventID,
@@ -102,6 +105,7 @@ app.get('/events/:id', (req, res) => {
         Event.eventDate,
         Event.venueID,
         Venue.venueName,
+        Venue.venueImage,
         Event.eventDesc,
         Event.eventTime,
         Event.performer,
@@ -117,12 +121,25 @@ app.get('/events/:id', (req, res) => {
       return res.status(404).json({ error: 'Event not found' });
     }
 
+    //convert venueImage BLOB to base64
+    if (event.venueImage) {
+      const base64VenueImage = Buffer.from(event.venueImage).toString('base64');
+      event.venueImage = `data:image/png;base64,${base64VenueImage}`;
+    }
+
+    //convert banner BLOB to base64
+    if (event.banner) {
+      const base64Banner = Buffer.from(event.banner).toString('base64');
+      event.banner = `data:image/png;base64,${base64Banner}`;
+    }
+
     // Get ticket options for this event
     const ticketQuery = `
       SELECT ticketType, price, quantity
       FROM TicketOption
       WHERE eventID = ?
     `;
+
     const ticketRows = db.prepare(ticketQuery).all(eventId);
 
     // Convert ticket options into an object like { general: 30, vip: 100, ... }
@@ -140,7 +157,7 @@ app.get('/events/:id', (req, res) => {
   }
 });
 
-app.get('/events/:id', (req, res) => {
+/*app.get('/events/:id', (req, res) => {
   try {
     const eventId = req.params.id;
     const query = `
@@ -169,7 +186,7 @@ app.get('/events/:id', (req, res) => {
     console.error('Error fetching event by ID:', err.message);
     res.status(500).json({ error: 'Failed to fetch event' });
   }
-});
+});*/
 
 app.get('/events/organiser/:organiser', (req, res) => {
   try {
