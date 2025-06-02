@@ -3,6 +3,8 @@ const cors = require('cors');
 const db = require('./database');
 const app = express();
 const PORT = 5000;
+const purchaseRouter = require('./routes/purchase');
+
 
 app.use(cors({
   origin: 'http://localhost:3000',
@@ -12,6 +14,8 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+app.use('/purchase', purchaseRouter);
 
 app.get('/venues', (req, res) => {
   try {

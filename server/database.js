@@ -43,7 +43,7 @@ const tableStatements = [
     FOREIGN KEY(eventID) REFERENCES Event(eventID)
   )`,
   `CREATE TABLE IF NOT EXISTS Ticket (
-    ticketID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ticketID TEXT PRIMARY KEY,
     eventID INTEGER,
     username TEXT,
     ticketType TEXT,
@@ -51,7 +51,8 @@ const tableStatements = [
     FOREIGN KEY(username) REFERENCES User(username)
   )`,
   `CREATE TABLE IF NOT EXISTS EventTransaction (
-    paymentID TEXT PRIMARY KEY,
+    transactionID INTEGER PRIMARY KEY AUTOINCREMENT,
+    paymentID TEXT,
     username TEXT,
     ticketID TEXT,
     quantity INTEGER,
@@ -60,7 +61,7 @@ const tableStatements = [
   )`
 ];
 
-// Run all table creation statements
+//run all table creation statements
 for (const statement of tableStatements) {
   db.prepare(statement).run();
 }
