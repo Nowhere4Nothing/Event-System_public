@@ -1,0 +1,23 @@
+.order-confirmation-container {
+  padding: 40px;
+  font-family: 'Neue Haas Grotesk', sans-serif;
+  max-width: 800px;        
+  margin: 0 auto;         
+}
+
+.ticket-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.ticket-item {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  line-height: 1.5;
+  color: #2c2c2c;
+}
+

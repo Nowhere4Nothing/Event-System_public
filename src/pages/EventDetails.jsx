@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './EventDetails.css';
 
 function EventDetails() {
@@ -9,6 +9,8 @@ function EventDetails() {
   const [selectedOption, setSelectedOption] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
 
   const handleBuyNow = async () => {
     if (!selectedOption) return;
@@ -48,7 +50,7 @@ function EventDetails() {
 
       const result = await res.json();
       if (res.ok) {
-        alert('Purchase successful!');
+        navigate(`/order-confirmation/${result.paymentID}`);      
       } else {
         alert('Purchase failed: ' + result.message);
       }

@@ -4,6 +4,7 @@ const db = require('./database');
 const app = express();
 const PORT = 5000;
 const purchaseRouter = require('./routes/purchase');
+const confirmationRoute = require('./routes/confirmation');
 
 
 app.use(cors({
@@ -16,6 +17,7 @@ app.use(cors({
 app.use(express.json());
 
 app.use('/purchase', purchaseRouter);
+app.use('/confirmation', confirmationRoute);
 
 app.get('/venues', (req, res) => {
   try {
@@ -156,6 +158,7 @@ app.get('/events/:id', (req, res) => {
     console.error('Error fetching event by ID:', err.message);
   }
 });
+
 
 /*app.get('/events/:id', (req, res) => {
   try {

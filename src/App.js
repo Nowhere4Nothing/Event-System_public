@@ -9,6 +9,7 @@ import AccountPage from './pages/AccountPage';
 import TicketDetails from './pages/TicketDetails';
 import BookingDetails from './pages/BookingDetails';
 import CreateEvent from './pages/CreateEvent';
+import OrderConfirmation from './pages/OrderConfirmation';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/ticket/:id" element={<TicketDetails />} />
           <Route path="/bookings/:id" element={<BookingDetails />} /> 
           <Route path="/create" element={<CreateEvent />} /> 
+          <Route path="/order-confirmation/:paymentID" element={<OrderConfirmation />} />
         </Routes>
       </Router>
     </CookiesProvider>
