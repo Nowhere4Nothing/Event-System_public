@@ -54,7 +54,7 @@ const CreateEvent = () => {
     const completeData = {
       ...formData,
       ticketOptions: ticketOptions,
-      organiserID: cookies.userCookie?.username
+      organiserID: cookies.userCookie.username
     };
     console.log('Complete Event Submission:', completeData);
     

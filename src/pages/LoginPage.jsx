@@ -4,24 +4,35 @@ import './LoginPage.css';
 import {useNavigate} from "react-router-dom";
 
 function LoginPage() {
-  const [accType, setAccType] = useState('guest');
+  // site function
   const [isRegistering, setIsRegistering] = useState(false);
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [dbAccounts, setDbAccounts] = useState([]);
   const [loadingDbAccounts, setLoadingDbAccounts] = useState(true);
   const [cookies, setCookie] = useCookies(['userCookie']);
   const navigate = useNavigate();
+  // form
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [userAddress, setUserAddress] = useState('');
+  const [phone, setPhone] = useState('');
+  const [accType, setAccType] = useState('Guest');
+  const [organisationName, setOrganisationName] = useState('');
+  
 
 
   useEffect(() => {
+      if(cookies.userCookie){
+      navigate('/account'); // If they somehow get to the login while already logged in, push them through.
+    }
+
+
     fetch('http://localhost:5000/users', {credentials: 'include'}) 
     .then(res => res.json())
     .then(data => {
-      console.log('Fetched user details:', data);
+    //  console.log('Fetched user details:', data); -- commented this out unless needed, this WAS printing user passwords in plaintext.
       setLoadingDbAccounts(false);
       setDbAccounts(data);
     })
@@ -44,7 +55,6 @@ function LoginPage() {
     }
     setErrorMessage('');
     setCookie('userCookie', user, { path: '/' });
-    // window.location.href = '/account';
     navigate('/account');
   }
 
@@ -52,9 +62,63 @@ function LoginPage() {
     e.preventDefault();
     if (password !== confirmPassword) {
       setErrorMessage('Passwords do not match!');
+      return;
     } else {
       setErrorMessage('');
     }
+    // Check if username already exists
+    const existingUser = dbAccounts.find((user) => user.username === username);
+    if (existingUser) {
+      setErrorMessage('Username is not available!');
+      return;
+    }
+
+    // Save account to DB
+    const newUser = {
+      username,
+      email,
+      password,
+      userType: accType,
+      address: userAddress,
+      phone
+    };
+    console.log('Registering new user:', newUser);
+    fetch('http://localhost:5000/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser)
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('User registered:', data);
+        setCookie('userCookie', newUser, { path: '/' });
+        navigate('/account');
+      })
+      .catch(err => {
+        console.error('Error registering user:', err);
+        setErrorMessage('Registration failed. Please try again.');
+      });
+
+    if(accType == 'Organiser') {
+      const newOrganiser = {
+        username,
+        organisationName
+      };
+      fetch('http://localhost:5000/organisers/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrganiser)
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log('Organiser registered:', data);
+        })
+        .catch(err => {
+          console.error('Error registering organiser:', err);
+          setErrorMessage('Organiser registration failed. Please try again.');
+        });
+    }
+
   };
 
   return (
@@ -104,6 +168,27 @@ function LoginPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
+              <br />
+              <label className="login-label">Address:</label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value={userAddress}
+                onChange={(e) => setUserAddress(e.target.value)}
+                required
+              />
+              <br />
+              <label className="login-label">Phone:</label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+              <br />
               {errorMessage && <p className="error-message">{errorMessage}</p>}
               <p className="login-label">I am a(n)...{' '}
               <select
@@ -111,10 +196,24 @@ function LoginPage() {
                   value={accType}
                   onChange={(e) => setAccType(e.target.value)}
                 >
-                  <option value="guest">Guest</option>
-                  <option value="organizer">Organizer</option>
+                  <option value="Guest">Guest</option>
+                  <option value="Organiser">Organiser</option>
                 </select>
               </p>
+                <br />
+                {accType == 'Organiser' ? (
+                <p>
+                  <label className='login-label'>Organisation Name:</label>
+                  <input
+                    type="text"
+                    id="organisation-name"
+                    name="organisation-name"
+                    value={organisationName}
+                    onChange={(e) => setOrganisationName(e.target.value)}
+                    required={accType === 'Organiser'}
+                  />
+                </p>
+                ) : null}
               <button type="submit" className="login-button">Register</button>
             </form>
           ) : (

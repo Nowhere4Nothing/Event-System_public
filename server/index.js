@@ -30,41 +30,9 @@ app.get('/venues', (req, res) => {
   }
 });
 
-app.post('/events', (req, res) => {
+app.get('/events', (req, res) => {
   try {
-    const {
-      eventName,
-      eventType,
-      eventDate,
-      venueID,
-      eventDesc,
-      eventTime,
-      performer,
-      banner,
-      organiserID
-    } = req.body;
-
     const query = `
-      INSERT INTO Event (
-        eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    const result = db.prepare(query).run(
-      eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
-    );
-    res.status(201).json({ eventID: result.lastInsertRowid });
-  } catch (err) {
-    console.error('Error creating event:', err.message);
-    res.status(500).json({ error: 'Failed to create event' });
-  }
-});
-
-
-app.get('/events/:id', (req, res) => {
-  try {
-    const eventId = req.params.id;
-
-    const eventQuery = `
       SELECT 
         Event.eventID,
         Event.eventName,
@@ -79,34 +47,12 @@ app.get('/events/:id', (req, res) => {
         Event.organiserID
       FROM Event
       LEFT JOIN Venue ON Event.venueID = Venue.venueID
-      WHERE Event.eventID = ?
     `;
-    const event = db.prepare(eventQuery).get(eventId);
-
-    if (!event) {
-      return res.status(404).json({ error: 'Event not found' });
-    }
-
-    // Get ticket options for this event
-    const ticketQuery = `
-      SELECT ticketType, price, quantity
-      FROM TicketOption
-      WHERE eventID = ?
-    `;
-    const ticketRows = db.prepare(ticketQuery).all(eventId);
-
-    // Convert ticket options into an object like { general: 30, vip: 100, ... }
-    const ticketOptions = {};
-    for (const row of ticketRows) {
-      ticketOptions[row.ticketType.toLowerCase()] = row.price;
-    }
-
-    // Attach to event
-    event.ticketOptions = ticketOptions;
-
-    res.json(event);
+    const rows = db.prepare(query).all();
+    res.json(rows);
   } catch (err) {
-    console.error('Error fetching event by ID:', err.message);
+    console.error('Error fetching events:', err.message);
+    res.status(500).json({ error: 'Failed to fetch events' });
   }
 });
 
@@ -141,8 +87,9 @@ app.get('/events/:id', (req, res) => {
   }
 });
 
-app.get('/events', (req, res) => {
+app.get('/events/organiser/:organiser', (req, res) => {
   try {
+    const organiserId = req.params.organiser;
     const query = `
       SELECT 
         Event.eventID,
@@ -158,15 +105,44 @@ app.get('/events', (req, res) => {
         Event.organiserID
       FROM Event
       LEFT JOIN Venue ON Event.venueID = Venue.venueID
+      WHERE Event.organiserID = ?
     `;
-    const rows = db.prepare(query).all();
+    const rows = db.prepare(query).all(organiserId);
     res.json(rows);
   } catch (err) {
-    console.error('Error fetching events:', err.message);
+    console.error('Error fetching events by organiser:', err.message);
     res.status(500).json({ error: 'Failed to fetch events' });
   }
 });
 
+app.post('/events', (req, res) => {
+  try {
+    const {
+      eventName,
+      eventType,
+      eventDate,
+      venueID,
+      eventDesc,
+      eventTime,
+      performer,
+      banner,
+      organiserID
+    } = req.body;
+
+    const query = `
+      INSERT INTO Event (
+        eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const result = db.prepare(query).run(
+      eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
+    );
+    res.status(201).json({ eventID: result.lastInsertRowid });
+  } catch (err) {
+    console.error('Error creating event:', err.message);
+    res.status(500).json({ error: 'Failed to create event' });
+  }
+});
 
 app.put('/events/:id', (req, res) => {
   try {
@@ -307,6 +283,131 @@ app.get('/users', (req, res) => {
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
+
+app.get('/users/:username', (req, res) => {
+  try {
+    const username = req.params.username;
+    const query = `
+      SELECT
+        User.username,
+        User.password,
+        User.userType,
+        User.email,
+        User.address,
+        User.phone
+      FROM User
+      WHERE User.username = ?
+    `;
+    const row = db.prepare(query).get(username);
+    if (!row) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(row);
+  } catch (err) {
+    console.error('Error fetching user by username:', err.message);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+app.post('/users', (req, res) => {
+  try {
+    const { username, password, userType, email, address, phone } = req.body;
+    const query = `
+      INSERT INTO User (username, password, userType, email, address, phone)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const result = db.prepare(query).run(username, password, userType, email, address, phone);
+    res.status(201).json({ username: result.lastInsertRowid });
+  } catch (err) {
+    console.error('Error creating user:', err.message);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+app.put('/users/:username', (req, res) => {
+  try {
+    const oldUsername = req.params.username;
+    const { username, userType, email, address, phone } = req.body;
+
+    const query = `
+      UPDATE User SET
+        username = ?,
+        userType = ?,
+        email = ?,
+        address = ?,
+        phone = ?
+      WHERE username = ?
+    `;
+    const result = db.prepare(query).run(username, userType, email, address, phone, oldUsername);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ message: 'User updated successfully' });
+  } catch (err) {
+    console.error('Error updating user:', err.message);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+app.post('/organisers/', (req, res) => {
+  try {
+    const { username, organisationName } = req.body;
+
+    const query = `
+      INSERT INTO Organiser (username, organisationName)
+      VALUES (?, ?)
+    `;
+    const result = db.prepare(query).run(username, organisationName);
+    res.status(201).json({ message: 'Organiser created successfully', organiserID: result.lastInsertRowid });
+  } catch (err) {
+    console.error('Error creating organiser:', err.message);
+    res.status(500).json({ error: 'Failed to create organiser' });
+  }
+});
+
+app.put('/passwords/:username', (req, res) => {
+  try {
+    const username = req.params.username;
+    const { password } = req.body;
+
+    const query = `
+      UPDATE User SET
+        password = ?
+      WHERE username = ?
+    `;
+    const result = db.prepare(query).run(password, username);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error('Error updating user password:', err.message);
+    res.status(500).json({ error: 'Failed to update user password' });
+  }
+});
+
+app.get('/tickets/:username', (req, res) => {
+  try {
+    const username = req.params.username;
+    const query = `
+      SELECT 
+        Ticket.ticketID,
+        Ticket.eventID,
+        Ticket.ticketType,
+        Event.eventName,
+        Event.eventDate
+      FROM Ticket
+      LEFT JOIN Event ON Ticket.eventID = Event.eventID
+      WHERE Ticket.username = ?
+    `;
+    const rows = db.prepare(query).all(username);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching tickets for user:', err.message);
+    res.status(500).json({ error: 'Failed to fetch tickets' });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
