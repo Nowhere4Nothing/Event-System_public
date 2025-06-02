@@ -107,7 +107,6 @@ app.get('/events/:id', (req, res) => {
     res.json(event);
   } catch (err) {
     console.error('Error fetching event by ID:', err.message);
-    res.status(500).json({ error: 'Failed to fetch event' });
   }
 });
 
