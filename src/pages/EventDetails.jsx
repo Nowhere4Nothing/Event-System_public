@@ -112,10 +112,10 @@ function EventDetails() {
   <div className="event-details-container">
     <div className="left-pane">
       <h1 className="event-title">{event.eventName}</h1>
-      <div className="event-description">
+      <div className="event-description" data-testid="event-description">
         <p><strong>Description: </strong>{event.eventDesc}</p>
-        <p className="event-date"><strong>Date: </strong>{formatDateToLocal(event.eventDate)}</p>
-        <p className="event-time"><strong>Time: </strong>{event.eventTime}</p>
+        <p className="event-date" data-testid="event-date"><strong>Date: </strong>{formatDateToLocal(event.eventDate)}</p>
+        <p className="event-time" data-testid="event-time"><strong>Time: </strong>{event.eventTime}</p>
       </div>
 
       <div className="event-content">
