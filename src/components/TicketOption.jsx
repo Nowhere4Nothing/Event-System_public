@@ -12,9 +12,9 @@ const TicketOption = ({ index, data, onChange, onRemove }) => {
     <div className="ticket-card">
       <input
         type="text"
-        name="ticketOption"
+        name="ticketType"
         placeholder="Option Name (e.g., VIP, General)"
-        value={data.ticketOption}
+        value={data.ticketType}
         onChange={handleChange}
       />
       <input
@@ -26,9 +26,9 @@ const TicketOption = ({ index, data, onChange, onRemove }) => {
       />
       <input
         type="number"
-        name="ticketCapacity"
+        name="quantity"
         placeholder="Capacity"
-        value={data.ticketCapacity}
+        value={data.quantity}
         onChange={handleChange}
       />
       <button
