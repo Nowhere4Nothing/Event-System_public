@@ -26,8 +26,8 @@ function TicketEventBar({ ticket, eventID }) {
       {loadingEvent ? <p>Loading event details...</p> : (
       <div>
         <span><h3>{transaction.eventName}</h3></span>
-        <p>{transaction.eventDate}, {transaction.eventTime}</p>
-        <span>Ticket {ticket.ticketID}, {ticket.ticketType}</span>
+        <p>Date/Time: {transaction.eventDate}, {transaction.eventTime}</p>
+        <span>Ticket: {ticket.ticketType}</span>
         <br />
         <ViewTicketButton ticket={transaction} />
       </div>
