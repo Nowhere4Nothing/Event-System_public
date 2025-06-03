@@ -510,6 +510,36 @@ app.get('/tickets/:username', (req, res) => {
   }
 });
 
+app.get('/transactions/:ticketID', (req, res) => {
+  try {
+    const ticketID = req.params.ticketID;
+    const query = `
+      SELECT 
+        EventTransaction.paymentID,
+        EventTransaction.username,
+        EventTransaction.ticketID,
+        Ticket.ticketType,
+        Ticket.eventID,
+        Event.eventName,
+        Event.eventDate,
+        Event.eventTime,
+        Venue.venueName
+      FROM EventTransaction
+      JOIN Ticket ON EventTransaction.ticketID = Ticket.ticketID
+      JOIN Event ON Ticket.eventID = Event.eventID
+      JOIN Venue ON Event.venueID = Venue.venueID
+      WHERE Ticket.ticketID = ?
+    `;
+    const row = db.prepare(query).get(ticketID);
+    if (!row) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+    res.json(row);
+  } catch (err) {
+    console.error('Error fetching transaction by ticket ID:', err.message);
+    res.status(500).json({ error: 'Failed to fetch transaction' });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
