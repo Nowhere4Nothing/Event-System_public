@@ -19,7 +19,7 @@ const CreateEvent = () => {
 
   // State for ticket options (initially one option)
   const [ticketOptions, setTicketOptions] = useState([
-    { ticketOption: '', price: '', ticketCapacity: '' }
+    { ticketType: '', price: '', quantity: '' }
   ]);
 
   // Update general event form fields
@@ -39,7 +39,7 @@ const CreateEvent = () => {
 
   // Add a new ticket option section
   const addTicketOption = () => {
-    setTicketOptions([...ticketOptions, { ticketOption: '', price: '', ticketCapacity: '' }]);
+    setTicketOptions([...ticketOptions, { ticketType: '', price: '', quantity: '' }]);
   };
 
   // Remove a ticket option by index
@@ -67,16 +67,30 @@ const CreateEvent = () => {
     .then(res => res.json())
     .then(data => {
       console.log('Event created:', data);
+      for(const option of ticketOptions) {
+        saveTicketOption(data.eventID, option);
+      }
       navigate('/');
     })
     .catch(err => {
       console.error('Error creating event:', err);
     });
 
-  fetch('http://localhost:5000/ticketOptions', {
+    
+  
+};
+
+  function saveTicketOption(eventID, ticketOption) {
+
+    const fullTicketOption = {
+      eventID,
+      ...ticketOption
+    };
+
+    fetch('http://localhost:5000/ticketOptions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(ticketOptions),
+    body: JSON.stringify(fullTicketOption),
     credentials: 'include'
   })
     .then(res => res.json())
@@ -86,7 +100,7 @@ const CreateEvent = () => {
     .catch(err => {
       console.error('Error creating ticket options:', err);
     });
-};
+  }
 
   useEffect(() => {
     if(cookies.userCookie && cookies.userCookie.userType === 'Organiser') {
