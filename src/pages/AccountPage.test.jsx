@@ -21,6 +21,7 @@ jest.mock('react-cookie', () => ({
 describe('<CookiesProvider>', () => {
     beforeEach(() => {
         global.fetch = jest.fn((url) => {
+            // fetching the user john
             if (url.includes('/tickets/johndoe')) {
                 return Promise.resolve({
                     ok: true,
@@ -31,6 +32,7 @@ describe('<CookiesProvider>', () => {
                 });
             }
 
+            // mock if the event id contains undefined errors
             if (url.includes('/events/') && !url.endsWith('undefined')) {
                 return Promise.resolve({
                     ok: true,
@@ -42,6 +44,7 @@ describe('<CookiesProvider>', () => {
                 });
             }
 
+            // mock for john (success)
             if (url.includes('/users/johndoe')) {
                 return Promise.resolve({
                     ok: true,
@@ -49,6 +52,7 @@ describe('<CookiesProvider>', () => {
                 });
             }
 
+            // mock if the user isnt found
             if (url.includes('/users/')) {
                 return Promise.resolve({
                     ok: false,
@@ -56,6 +60,7 @@ describe('<CookiesProvider>', () => {
                 });
             }
 
+            // for any other unexpected errors
             return Promise.reject('Unknown URL ' + url);
         });
     });
@@ -71,10 +76,10 @@ describe('<CookiesProvider>', () => {
         const elements = await screen.findAllByText(/johndoe/i);
         expect(elements.length).toBeGreaterThan(0);
 
+        // the email displaying
         expect(await screen.findByText(/johndoe@example.com/i)).toBeInTheDocument();
 
         // Wait for fetch to load tickets
-
         expect(await screen.findByText(/vip/i)).toBeInTheDocument();
         expect(await screen.findByText(/standard/i)).toBeInTheDocument();
 
@@ -83,14 +88,17 @@ describe('<CookiesProvider>', () => {
     test('allows entering edit mode and updating email', async () => {
         render(<AccountPage />);
 
+        // edit button works
         fireEvent.click(screen.getByRole('button', { name: /edit/i }));
 
+        // changing the email address
         const emailInput = screen.getByLabelText(/email/i);
         fireEvent.change(emailInput, { target: { value: 'newemail@example.com' } });
 
+        // the save button works
         fireEvent.click(screen.getByRole('button', { name: /save/i }));
 
+        // the changed email displaying
         expect(await screen.findByText('newemail@example.com')).toBeInTheDocument();
-
     });
 })

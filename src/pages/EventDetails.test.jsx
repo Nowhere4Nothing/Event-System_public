@@ -24,8 +24,8 @@ describe('<EventDetails />', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-
         global.fetch = jest.fn((url) => {
+            // mocking the event found
             if (url.includes('/events/1')) {
                 return Promise.resolve({
                     ok: true,
@@ -41,6 +41,7 @@ describe('<EventDetails />', () => {
                 });
             }
 
+            // mocking the event wih ticket option chosen
             if (url.includes('/ticketOptions/1')) {
                 return Promise.resolve({
                     ok: true,
@@ -85,6 +86,7 @@ describe('<EventDetails />', () => {
             </MemoryRouter>
         );
 
+        // finding the displayed headings
         const headingTwo = await screen.findByRole('heading', {name: /Ticket Options/i});
         expect(headingTwo).toBeInTheDocument()
 
@@ -113,7 +115,7 @@ describe('<EventDetails />', () => {
             </MemoryRouter>
         );
 
-
+        // what should be displayed
         const select = await screen.findByLabelText(/choose a ticket type/i);
         expect(select).toHaveValue('1');
 
@@ -130,6 +132,8 @@ describe('<EventDetails />', () => {
 
     test('error handling database down', async () => {
         jest.clearAllMocks();
+
+        // the fail
         global.fetch = jest.fn(() => Promise.reject(new Error('Event not found')));
 
         render(
@@ -140,6 +144,7 @@ describe('<EventDetails />', () => {
             </MemoryRouter>
         );
 
+        // getting the calls
         expect(fetch).toHaveBeenCalledTimes(2);
 
         expect(fetch).toHaveBeenNthCalledWith(
