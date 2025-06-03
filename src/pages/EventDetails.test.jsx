@@ -1,5 +1,5 @@
 import EventDetails from './EventDetails';
-import {render, screen, fireEvent, waitFor} from '@testing-library/react';
+import {render, screen, fireEvent} from '@testing-library/react';
 import {MemoryRouter,Route, Routes} from "react-router-dom";
 import React from "react";
 
@@ -23,11 +23,28 @@ jest.mock('react-router-dom', () => ({
 describe('<EventDetails />', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        global.fetch = jest.fn(() =>
-            Promise.resolve({
-                ok: true,
-                json: () =>
-                    Promise.resolve(
+
+
+        global.fetch = jest.fn((url) => {
+            if (url.includes('/events/1')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({
+                        eventID: 1,
+                        eventName: 'Rock Night',
+                        eventType: 'Music',
+                        eventDate: '2025-05-20',
+                        eventTime: '21:00',
+                        eventDesc: 'Rock Night for the ages',
+                        eventPrice: '$150',
+                    }),
+                });
+            }
+
+            if (url.includes('/ticketOptions/1')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve([
                         {
                             eventID: 1,
                             eventName: 'Rock Night',
@@ -36,93 +53,111 @@ describe('<EventDetails />', () => {
                             eventTime: '21:00',
                             eventDescription: 'Rock Night for the ages',
                             eventPrice: '$150', // change this when they add an event price
+                            ticketOptionID: 1,
+                            ticketType: 'General Admission',
+                            price: 50,
                         },
-                    ),
-            })
-        );
+
+                        {
+                            ticketOptionID: 2,
+                            ticketType: 'VIP',
+                            price: 100,
+                        },
+                        {
+                            ticketOptionID: 3,
+                            ticketType: 'Student',
+                            price: 25,
+                        },
+                    ]),
+                });
+            }
+
+            return Promise.reject(new Error('unknown URL'));
+        });
     });
 
-        test('displays loaded event data', async () => {
-            render(<MemoryRouter initialEntries={['/events/1']}>
-                        <Routes>
-                            <Route path="/events/:id" element={<EventDetails />} />
-                        </Routes>
-                    </MemoryRouter>
-            );
+    test('displays loaded event data', async () => {
+        render(
+            <MemoryRouter initialEntries={['/events/1']}>
+                <Routes>
+                    <Route path="/events/:id" element={<EventDetails/>}/>
+                </Routes>
+            </MemoryRouter>
+        );
 
-            expect(await screen.findByText(/loading/i)).toBeInTheDocument();
+        const headingTwo = await screen.findByRole('heading', {name: /Ticket Options/i});
+        expect(headingTwo).toBeInTheDocument()
 
-            // Looking for the headings
-            const heading = await screen.findByRole('heading', { name: /Rock Night/i });
-            expect(heading).toBeInTheDocument();
+        const quantitySelect = await screen.findByLabelText(/Quantity:/i);
+        expect(quantitySelect).toBeInTheDocument();
+        expect(quantitySelect.value).toBe('1');
 
-            const headingTwo = await screen.findByRole('heading', { name: /Ticket Options/i });
-            expect(headingTwo).toBeInTheDocument()
+        expect(await screen.findByTestId('event-description')).toBeInTheDocument(/Rock Night for the ages/i);
+        expect(await screen.findByTestId('event-date')).toHaveTextContent(formatDateToLocal('2025-05-20'));
+        expect(await screen.findByTestId('event-time')).toHaveTextContent('21:00');
 
-            // finding the seating area and drop down box
-            const headingThree = await screen.findByRole('heading', { name: /Seating Area/i });
-            expect(headingThree).toBeInTheDocument()
+        const buttonBuy = await screen.findByRole('button', {name: /Buy now/i});
+        expect(buttonBuy).toBeInTheDocument();
 
-            expect(await screen.findByTestId('event-description')).toBeInTheDocument(/Rock Night for the ages/i);
-            expect(await screen.findByTestId('event-date')).toHaveTextContent(formatDateToLocal('2025-05-20'));
-            expect(await screen.findByTestId('event-time')).toHaveTextContent('21:00');
-
-            const label = await screen.findByLabelText(/Choose a seating type/i);
-            expect(label).toBeInTheDocument();
-
-            // Ensure select exists and default value is General Admission
-            const select = await screen.findByRole('combobox');
-            expect(select).toHaveValue('general');
-
-            // looking for the price
-            expect(await screen.findByText('$TBD')).toBeInTheDocument();
-            expect(await screen.findByText('VIP')).toBeInTheDocument();
-            expect(await screen.findByText('+ $50 Upgrade')).toBeInTheDocument();
-
-        });
+        const eventImage = await screen.findByRole('img', {name: /event visual/i});
+        expect(eventImage).toBeInTheDocument();
+    });
 
 
     test('updates seatType when a new option is selected', async () => {
         render(
-            <MemoryRouter>
-                <EventDetails />
+            <MemoryRouter initialEntries={['/events/1']}>
+                <Routes>
+                    <Route path="/events/:id" element={<EventDetails/>}/>
+                </Routes>
             </MemoryRouter>
         );
 
-        const select = await screen.findByRole('combobox');
 
-        // Initially: General Admission
-        fireEvent.change(screen.getByLabelText(/choose a seating type/i), {
-            target: { value: "general" },
-        });
+        const select = await screen.findByLabelText(/choose a ticket type/i);
+        expect(select).toHaveValue('1');
 
-        // Changed to "Reserved Seating"
-        fireEvent.change(select, { target: { value: 'reserved' } });
-        expect(select).toHaveValue('reserved');
+        // Change to ticketOptionID 2
+        fireEvent.change(select, {target: {value: '2'}});
+        expect(select).toHaveValue('2');
 
-        // Change to "VIP Lounge"
-        fireEvent.change(select, { target: { value: 'vip' } });
-        expect(select).toHaveValue('vip');
+
+        // Change to ticketOptionID 3
+        fireEvent.change(select, {target: {value: '3'}});
+        expect(select).toHaveValue('3');
+    });
+
+
+    test('error handling database down', async () => {
+        jest.clearAllMocks();
+        global.fetch = jest.fn(() => Promise.reject(new Error('Event not found')));
+
+        render(
+            <MemoryRouter initialEntries={['/events/1']}>
+                <Routes>
+                    <Route path="/events/:id" element={<EventDetails/>}/>
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(fetch).toHaveBeenCalledTimes(2);
+
+        expect(fetch).toHaveBeenNthCalledWith(
+            1,
+            'http://localhost:5000/events/1',
+            {credentials: 'include'}
+        );
+
+        expect(fetch).toHaveBeenNthCalledWith(
+            2,
+            'http://localhost:5000/ticketOptions/1'
+        );
+
+        // Wait for the error UI to appear
+        const errorMessage = await screen.findByText(/event not found|error loading event/i);
+        expect(errorMessage).toBeInTheDocument();
     });
 });
 
-test('error handling database down', async () => {
-    // making a failing fetch call
-    global.fetch = jest.fn(() => Promise.reject('shits fucked'));
 
-    render(<MemoryRouter initialEntries={['/events/1']}>
-            <Routes>
-                <Route path="/events/:id" element={<EventDetails />} />
-            </Routes>
-        </MemoryRouter>
-    );
-    await waitFor(() => {
-        // waiting for all fetch calls to the database
-        expect(fetch).toHaveBeenCalledWith('http://localhost:5000/events/1');
-    });
-
-    // Wait for error UI to appear
-    const errorMessage = await screen.findByText(/event not found|error loading event/i);
-    expect(errorMessage).toBeInTheDocument();
-})
 
