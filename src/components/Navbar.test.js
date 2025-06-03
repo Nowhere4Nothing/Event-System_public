@@ -95,7 +95,7 @@ describe('Navbar', () => {
 
         // waiting for the reply and going to the correct address
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith('/events/1');
+            expect(mockNavigate).toHaveBeenCalledWith('/search?q=1');
         });
 
         // second test with event name
@@ -106,7 +106,7 @@ describe('Navbar', () => {
         console.log("Mock: ", mockNavigate.mock.calls);
 
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith('/events/1');
+            expect(mockNavigate).toHaveBeenCalledWith('/search?q=Rock%20Night');
         });
 
         // finding the login button

@@ -10,6 +10,7 @@ import TicketDetails from './pages/TicketDetails';
 import BookingDetails from './pages/BookingDetails';
 import CreateEvent from './pages/CreateEvent';
 import OrderConfirmation from './pages/OrderConfirmation';
+import SearchResult from './pages/SearchResult';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/events/:id" element={<EventDetails />} />
+          <Route path="/search" element={<SearchResult />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/ticket/:id" element={<TicketDetails />} />

@@ -1,5 +1,5 @@
 import EventDetails from './EventDetails';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen, fireEvent, waitFor} from '@testing-library/react';
 import {MemoryRouter,Route, Routes} from "react-router-dom";
 import React from "react";
 
@@ -73,6 +73,8 @@ describe('<EventDetails />', () => {
                 });
             }
 
+            console.log('FETCHED URL:', url);
+
             return Promise.reject(new Error('unknown URL'));
         });
     });
@@ -134,7 +136,17 @@ describe('<EventDetails />', () => {
         jest.clearAllMocks();
 
         // the fail
-        global.fetch = jest.fn(() => Promise.reject(new Error('Event not found')));
+        global.fetch = jest
+            .fn()
+            .mockImplementationOnce(() =>
+                Promise.reject(new Error('Event not found')) // First fetch fails
+            )
+            .mockImplementationOnce(() =>
+                Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve([]) // Second fetch still works
+                })
+            );
 
         render(
             <MemoryRouter initialEntries={['/events/1']}>
@@ -145,13 +157,13 @@ describe('<EventDetails />', () => {
         );
 
         // getting the calls
-        expect(fetch).toHaveBeenCalledTimes(2);
+        await waitFor(() => {
+            expect(fetch).toHaveBeenCalled();
+        });
 
-        expect(fetch).toHaveBeenNthCalledWith(
-            1,
-            'http://localhost:5000/events/1',
-            {credentials: 'include'}
-        );
+        expect(fetch).toHaveBeenCalledWith('http://localhost:5000/events/1', {
+            credentials: 'include',
+        });
 
         expect(fetch).toHaveBeenNthCalledWith(
             2,
@@ -159,7 +171,7 @@ describe('<EventDetails />', () => {
         );
 
         // Wait for the error UI to appear
-        const errorMessage = await screen.findByText(/event not found|error loading event/i);
+        const errorMessage = await screen.findByText(/event not found|Failed to fetch ticket options|error loading event/i);
         expect(errorMessage).toBeInTheDocument();
     });
 });

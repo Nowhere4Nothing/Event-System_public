@@ -27,44 +27,48 @@ jest.mock('../components/Categories', () => () => <div data-testid="categories" 
 jest.mock('../components/UpcomingEvents', () => () => <div data-testid="upcoming-events" />)
 jest.mock('../components/FeaturedEvents', () => () => <div data-testid="featured-events" />)
 
-// happy paths
-beforeEach(() => {
-    global.fetch = jest.fn(() =>
-        Promise.resolve({
-            // making a test event
-            json: () => Promise.resolve([{ id: 1, name: 'Slipknot' }]),
-        })
-    );
-});
-
-afterEach(() => {
-    jest.clearAllMocks();
-});
-
-test("renders without crashing", async () => {
-    render(<Home />);
-
-    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
-
-
-    await waitFor(() => {
-        // waiting for the database to be called before the rest is shown on screen
-        expect(fetch).toHaveBeenCalledWith('http://localhost:5000/events');
+describe('<Home />', () => {
+    // happy paths
+    beforeEach(() => {
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                // making a test event
+                json: () => Promise.resolve([{ id: 1, name: 'Slipknot' }]),
+            })
+        );
     });
 
-    await WhatShouldBeOnScreen();
-});
-
-test('error handling database down', async () => {
-    // making a failing fetch call
-    global.fetch = jest.fn(() => Promise.reject('shits fucked'));
-
-    render(<Home />);
-    await waitFor(() => {
-        // waiting for all fetch calls to the database
-        expect(fetch).toHaveBeenCalledWith('http://localhost:5000/events');
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
-    await WhatShouldBeOnScreen();
+    test("renders without crashing", async () => {
+        render(<Home />);
+
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+
+
+        await waitFor(() => {
+            // waiting for the database to be called before the rest is shown on screen
+            expect(fetch).toHaveBeenCalledWith('http://localhost:5000/events');
+        });
+
+        await WhatShouldBeOnScreen();
+    });
+
+    test('error handling database down', async () => {
+        // making a failing fetch call
+        global.fetch = jest.fn(() => Promise.reject('shits fucked'));
+
+        render(<Home />);
+        await waitFor(() => {
+            // waiting for all fetch calls to the database
+            expect(fetch).toHaveBeenCalledWith('http://localhost:5000/events');
+        });
+
+        await WhatShouldBeOnScreen();
+    })
+
+
 })
 
