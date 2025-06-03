@@ -30,7 +30,9 @@ function Navbar() {
                     id: event.eventID,
                     name: event.eventName,
                     genre: event.eventType,
-                    day: event.eventDate
+                    day: event.eventDate,
+                    performer: event.performer,
+                    venue: event.venueName || 'Unknown',
                 }));
                     // updating the state
                     setEvents(formattedEvents);
@@ -45,36 +47,21 @@ function Navbar() {
         })();
     }, []);
 
-        const handleSearch = (e) => {
-            setSearchTerm(e.target.value);
-            setError(false);
-            /*
-            Triggered when user types in search bar
-            updates search team and resets the error message
-             */
-
+    //called wen user types into search input
+    const handleSearch = (e) => {
+        // clear and update entries
+        setError(false);
+        setSearchTerm(e.target.value);
     };
 
+    // called when search submitted
     const handleSearchSubmit = (e) => {
+        // doesnt reload page and trims search item
         e.preventDefault();
-        const search = searchTerm.trim().toLowerCase();
-        console.log("events:", events);
-        const matchedEvent = events.find((event) =>
-            String(event?.id) === search ||
-            event?.name.toLowerCase() === search ||
-            event?.genre.toLowerCase() === search ||
-            event?.day.toLowerCase() === search
-        );
-
-        console.log('search:', search);
-        console.log('matchedEvent:', matchedEvent);
-
-        if (matchedEvent) {
-            // go to this page if matches
-            navigate(`/events/${matchedEvent.id}`);
-        } else {
-            console.log("matched event = ", matchedEvent);
-            setError(true);
+        const trimmedSearch = searchTerm.trim();
+        if (trimmedSearch) {
+            // navigating to the SearchResult with what was written in
+            navigate(`/search?q=${encodeURIComponent(trimmedSearch)}`);
         }
     };
 
@@ -116,6 +103,7 @@ function Navbar() {
                 data-testid="login-button"
                 onClick={() => navigate('/login')}>Login</button>
         )}
+
         {/*Display filtered events */}
         <div className = "event-list">
             {/* Display loading message while fetching data */}
@@ -130,7 +118,6 @@ function Navbar() {
                 Event not found. Please check the spelling or try another event.
             </div>
         )}
-
     </nav>
   );
 
