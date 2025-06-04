@@ -64,27 +64,15 @@ app.get('/events', (req, res) => {
 });
 
 app.post('/events', (req, res) => {
-  try {
-    const {
-      eventName,
-      eventType,
-      eventDate,
-      venueID,
-      eventDesc,
-      eventTime,
-      performer,
-      banner,
-      organiserID
-    } = req.body;
+  const { eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID } = req.body;
 
-    const query = `
-      INSERT INTO Event (
-        eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    const result = db.prepare(query).run(
-      eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
-    );
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO Event (eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    const result = stmt.run(eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID);
+
     res.status(201).json({ eventID: result.lastInsertRowid });
   } catch (err) {
     console.error('Error creating event:', err.message);
