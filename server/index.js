@@ -405,6 +405,29 @@ app.put('/events/:id', (req, res) => {
   res.json({ message: 'Event updated' });
 });
 
+app.delete('/events/:id', (req, res) => {
+  const eventID = req.params.id;
+
+  try {
+
+    const deleteTickets = db.prepare(`DELETE FROM TicketOption WHERE eventID = ?`);
+    deleteTickets.run(eventID);
+
+    const deleteEvent = db.prepare(`DELETE FROM Event WHERE eventID = ?`);
+    const result = deleteEvent.run(eventID);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    res.json({ message: 'Event and related tickets deleted' });
+  } catch (err) {
+    console.error('Error deleting event:', err.message);
+    res.status(500).json({ error: 'Failed to delete event' });
+  }
+});
+
+
 app.get('/users', (req, res) => {
   try {
     const query = `
