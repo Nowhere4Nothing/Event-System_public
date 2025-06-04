@@ -1,26 +1,30 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Categories.css';
 
-function Categories({ onSelect }) {
+function Categories() {
   const [active, setActive] = useState(null);
-  const categories = ['Music', 'Tech', 'Free'];
+  const navigate = useNavigate();
+  const categories = ['All', 'Music', 'Tech', 'Comedy', 'Family', 'Free'];
 
   const handleClick = (category) => {
     setActive(category);
-    onSelect && onSelect(category); // optional callback
+    navigate(`/events/type/${category.toLowerCase()}`); 
   };
 
   return (
     <div className="category-bar">
-      {categories.map((cat) => (
-        <button
-          key={cat}
-          className={`category-button ${active === cat ? 'active' : ''}`}
-          onClick={() => handleClick(cat)}
-        >
-          {cat}
-        </button>
-      ))}
+      <div className="category-buttons">
+        {categories.map(cat => (
+          <button
+            key={cat}
+            className={`category-button ${active === cat ? 'active' : ''}`}
+            onClick={() => handleClick(cat)}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

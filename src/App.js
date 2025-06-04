@@ -12,6 +12,7 @@ import CreateEvent from './pages/CreateEvent';
 import EditEvent from './pages/EditEvent';
 import OrderConfirmation from './pages/OrderConfirmation';
 import SearchResult from './pages/SearchResult';
+import EventCategoryPage from './pages/EventCategoryPage';
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
           <Route path="/create" element={<CreateEvent />} /> 
           <Route path="/order-confirmation/:paymentID" element={<OrderConfirmation />} />
           <Route path="/edit/:id" element={<EditEvent />} />
+          <Route path="/events/type/:category" element={<EventCategoryPage />} />
         </Routes>
       </Router>
     </CookiesProvider>
