@@ -327,20 +327,45 @@ app.get('/ticketOptions/:eventID', (req, res) => {
   }
 });
 
-app.post('/ticketOptions', (req, res) => {
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
   try {
-    const { eventID, ticketType, price, quantity } = req.body;
-    const query = `
-      INSERT INTO TicketOption (eventID, ticketType, price, quantity)
-      VALUES (?, ?, ?, ?)
-    `;
-    const result = db.prepare(query).run(eventID, ticketType, price, quantity);
-    res.status(201).json({ ticketOptionID: result.lastInsertRowid });
+    
+    const eventResponse = await fetch('http://localhost:5000/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...formData,
+        organiserID: cookies.userCookie.username
+      }),
+      credentials: 'include'
+    });
+
+    const eventData = await eventResponse.json();
+    const newEventID = eventData.eventID;
+
+  
+    const enrichedTickets = ticketOptions.map(option => ({
+      eventID: newEventID,
+      ticketType: option.ticketOption,
+      price: parseFloat(option.price),
+      quantity: parseInt(option.ticketCapacity, 10)
+    }));
+
+
+    await fetch('http://localhost:5000/ticketOptions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(enrichedTickets),
+      credentials: 'include'
+    });
+
+    navigate('/');
   } catch (err) {
-    console.error('Error creating ticket option:', err.message);
-    res.status(500).json({ error: 'Failed to create ticket option' });
+    console.error('Submission error:', err);
   }
-});
+};
 
 app.put('/ticketOptions/:id', (req, res) => {
   try {
