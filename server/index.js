@@ -327,45 +327,42 @@ app.get('/ticketOptions/:eventID', (req, res) => {
   }
 });
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+app.post('/ticketOptions', (req, res) => {
+  const ticketOptions = req.body;
+
+  if (!Array.isArray(ticketOptions)) {
+    return res.status(400).json({ error: 'Expected an array of ticket options' });
+  }
 
   try {
-    
-    const eventResponse = await fetch('http://localhost:5000/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...formData,
-        organiserID: cookies.userCookie.username
-      }),
-      credentials: 'include'
-    });
+    const stmt = db.prepare(`
+      INSERT INTO TicketOption (eventID, ticketType, price, quantity)
+      VALUES (?, ?, ?, ?)
+    `);
 
-    const eventData = await eventResponse.json();
-    const newEventID = eventData.eventID;
+    const inserted = [];
 
-  
-    const enrichedTickets = ticketOptions.map(option => ({
-      eventID: newEventID,
-      ticketType: option.ticketOption,
-      price: parseFloat(option.price),
-      quantity: parseInt(option.ticketCapacity, 10)
-    }));
+    for (const option of ticketOptions) {
+      if (!option.eventID || !option.ticketType || isNaN(option.price) || isNaN(option.quantity)) {
+        continue;
+      }
 
+      const result = stmt.run(
+        option.eventID,
+        option.ticketType,
+        option.price,
+        option.quantity
+      );
 
-    await fetch('http://localhost:5000/ticketOptions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(enrichedTickets),
-      credentials: 'include'
-    });
+      inserted.push(result.lastInsertRowid);
+    }
 
-    navigate('/');
+    res.status(201).json({ message: 'Ticket options inserted', inserted });
   } catch (err) {
-    console.error('Submission error:', err);
+    res.status(500).json({ error: 'Failed to insert ticket options' });
   }
-};
+});
+
 
 app.put('/ticketOptions/:id', (req, res) => {
   try {
