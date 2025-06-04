@@ -64,27 +64,15 @@ app.get('/events', (req, res) => {
 });
 
 app.post('/events', (req, res) => {
-  try {
-    const {
-      eventName,
-      eventType,
-      eventDate,
-      venueID,
-      eventDesc,
-      eventTime,
-      performer,
-      banner,
-      organiserID
-    } = req.body;
+  const { eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID } = req.body;
 
-    const query = `
-      INSERT INTO Event (
-        eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    const result = db.prepare(query).run(
-      eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
-    );
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO Event (eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    const result = stmt.run(eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID);
+
     res.status(201).json({ eventID: result.lastInsertRowid });
   } catch (err) {
     console.error('Error creating event:', err.message);
@@ -387,6 +375,65 @@ app.put('/ticketOptions/:id', (req, res) => {
     res.status(500).json({ error: 'Failed to update ticket option' });
   }
 });
+
+app.get('/events/:id', (req, res) => {
+  const stmt = db.prepare('SELECT * FROM Event WHERE eventID = ?');
+  const event = stmt.get(req.params.id);
+
+  if (!event) {
+    return res.status(404).json({ error: 'Event not found' });
+  }
+
+  res.json(event);
+});
+
+app.get('/ticketOptions/byEvent/:eventID', (req, res) => {
+  const stmt = db.prepare('SELECT * FROM TicketOption WHERE eventID = ?');
+  const tickets = stmt.all(req.params.eventID);
+  res.json(tickets);
+});
+
+app.put('/events/:id', (req, res) => {
+  const { eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID } = req.body;
+
+  const stmt = db.prepare(`
+    UPDATE Event SET
+      eventName = ?,
+      eventType = ?,
+      eventDate = ?,
+      eventTime = ?,
+      venueID = ?,
+      eventDesc = ?,
+      performer = ?,
+      organiserID = ?
+    WHERE eventID = ?
+  `);
+
+stmt.run(eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID, eventID);
+});
+
+app.delete('/events/:id', (req, res) => {
+  const eventID = req.params.id;
+
+  try {
+
+    const deleteTickets = db.prepare(`DELETE FROM TicketOption WHERE eventID = ?`);
+    deleteTickets.run(eventID);
+
+    const deleteEvent = db.prepare(`DELETE FROM Event WHERE eventID = ?`);
+    const result = deleteEvent.run(eventID);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    res.json({ message: 'Event and related tickets deleted' });
+  } catch (err) {
+    console.error('Error deleting event:', err.message);
+    res.status(500).json({ error: 'Failed to delete event' });
+  }
+});
+
 
 app.get('/users', (req, res) => {
   try {

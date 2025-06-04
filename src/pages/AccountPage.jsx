@@ -280,7 +280,15 @@ function AccountPage() {
           ) : (
             userDetails.userType == "Organiser" ? (
             myDBEvents.map(event => (
-              <EventBar key={event.eventID} event={event} />))
+              <EventBar
+                key={event.eventID}
+                event={event}
+                onDelete={(id) => {
+                setDbEvents(prev => prev.filter(e => e.eventID !== id));
+              }}
+              />
+            ))
+
             ) : (
               myDBEvents.map(ticket => (
               <TicketEventBar key={ticket.ticketID} ticket={ticket} eventID={ticket.eventID} />

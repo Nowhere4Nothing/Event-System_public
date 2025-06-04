@@ -1,4 +1,3 @@
-// Restore CreateEvent.jsx functionality
 import React, { useState, useEffect } from 'react';
 import TicketOption from '../components/TicketOption';
 import './CreateEvent.css';
