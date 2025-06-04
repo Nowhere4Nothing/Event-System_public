@@ -388,6 +388,35 @@ app.put('/ticketOptions/:id', (req, res) => {
   }
 });
 
+app.get('/events/:id', (req, res) => {
+  const stmt = db.prepare('SELECT * FROM Event WHERE eventID = ?');
+  const event = stmt.get(req.params.id);
+
+  if (!event) {
+    return res.status(404).json({ error: 'Event not found' });
+  }
+
+  res.json(event);
+});
+
+app.get('/ticketOptions/byEvent/:eventID', (req, res) => {
+  const stmt = db.prepare('SELECT * FROM TicketOption WHERE eventID = ?');
+  const tickets = stmt.all(req.params.eventID);
+  res.json(tickets);
+});
+
+app.put('/events/:id', (req, res) => {
+  const { eventName, eventType, eventDate, eventTime, eventDesc, performer, venueID } = req.body;
+  const stmt = db.prepare(`
+    UPDATE Event SET
+      eventName = ?, eventType = ?, eventDate = ?, eventTime = ?,
+      eventDesc = ?, performer = ?, venueID = ?
+    WHERE eventID = ?
+  `);
+  stmt.run(eventName, eventType, eventDate, eventTime, eventDesc, performer, venueID, req.params.id);
+  res.json({ message: 'Event updated' });
+});
+
 app.get('/users', (req, res) => {
   try {
     const query = `
