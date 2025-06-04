@@ -55,7 +55,9 @@ const EditEvent = () => {
         await fetch(`http://localhost:5000/events/${eventID}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData),
+            body: JSON.stringify({
+                ...formData,
+                organiserID: cookies.userCookie.username}),
             credentials: 'include'
         });
 
@@ -68,7 +70,7 @@ const EditEvent = () => {
                 eventID,
                 ticketType: option.ticketOption,
                 price: parseFloat(option.price),
-                quantity: parseInt(option.ticketCapacity, 10)
+                quantity: parseInt(option.ticketCapacity, 10),
             }),
             credentials: 'include'
             });

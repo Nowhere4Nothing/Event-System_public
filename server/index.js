@@ -394,15 +394,22 @@ app.get('/ticketOptions/byEvent/:eventID', (req, res) => {
 });
 
 app.put('/events/:id', (req, res) => {
-  const { eventName, eventType, eventDate, eventTime, eventDesc, performer, venueID } = req.body;
+  const { eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID } = req.body;
+
   const stmt = db.prepare(`
     UPDATE Event SET
-      eventName = ?, eventType = ?, eventDate = ?, eventTime = ?,
-      eventDesc = ?, performer = ?, venueID = ?
+      eventName = ?,
+      eventType = ?,
+      eventDate = ?,
+      eventTime = ?,
+      venueID = ?,
+      eventDesc = ?,
+      performer = ?,
+      organiserID = ?
     WHERE eventID = ?
   `);
-  stmt.run(eventName, eventType, eventDate, eventTime, eventDesc, performer, venueID, req.params.id);
-  res.json({ message: 'Event updated' });
+
+stmt.run(eventName, eventType, eventDate, eventTime, venueID, eventDesc, performer, organiserID, eventID);
 });
 
 app.delete('/events/:id', (req, res) => {
