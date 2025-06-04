@@ -49,59 +49,45 @@ const CreateEvent = () => {
   };
 
   // Submit the form (combine all inputs into one object and log it)
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const completeData = {
-      ...formData,
-      ticketOptions: ticketOptions,
-      organiserID: cookies.userCookie.username
-    };
-    console.log('Complete Event Submission:', completeData);
-    
-  fetch('http://localhost:5000/events', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(completeData),
-    credentials: 'include',
-  })
-    .then(res => res.json())
-    .then(data => {
-      console.log('Event created:', data);
-      for(const option of ticketOptions) {
-        saveTicketOption(data.eventID, option);
-      }
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+    try {
+      //Submit event
+      const eventResponse = await fetch('http://localhost:5000/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          organiserID: cookies.userCookie.username
+        }),
+        credentials: 'include'
+      });
+
+      const eventData = await eventResponse.json();
+      const newEventID = eventData.eventID;
+
+      // Prepare ticket options
+      const enrichedTickets = ticketOptions.map(option => ({
+        eventID: newEventID,
+        ticketType: option.ticketOption,
+        price: parseFloat(option.price),
+        quantity: parseInt(option.ticketCapacity, 10)
+      }));
+
+      //Submit ticket options
+      await fetch('http://localhost:5000/ticketOptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(enrichedTickets),
+        credentials: 'include'
+      });
+
       navigate('/');
-    })
-    .catch(err => {
-      console.error('Error creating event:', err);
-    });
-
-    
-  
-};
-
-  function saveTicketOption(eventID, ticketOption) {
-
-    const fullTicketOption = {
-      eventID,
-      ...ticketOption
-    };
-
-    fetch('http://localhost:5000/ticketOptions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(fullTicketOption),
-    credentials: 'include'
-  })
-    .then(res => res.json())
-    .then(data => {
-      console.log('Ticket options created:', data);
-    })
-    .catch(err => {
-      console.error('Error creating ticket options:', err);
-    });
-  }
-
+    } catch (err) {
+      console.error('Submission error:', err);
+    }
+  };
   useEffect(() => {
     if(cookies.userCookie && cookies.userCookie.userType === 'Organiser') {
       setUser(cookies.userCookie.username)
