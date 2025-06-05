@@ -37,6 +37,55 @@ app.get('/venues', (req, res) => {
   }
 });
 
+app.delete('/tickets/:ticketID', (req, res) => {
+  const ticketID = req.params.ticketID;
+
+  try {
+    //fetch ticket details before deleting
+    const ticket = db.prepare(`
+      SELECT eventID, ticketType
+      FROM Ticket
+      WHERE ticketID = ?
+    `).get(ticketID);
+
+    if (!ticket) {
+      return res.status(404).send({ error: 'Ticket not found.' });
+    }
+
+    //increase available quantity in TicketOption
+    const updateQuantity = db.prepare(`
+      UPDATE TicketOption
+      SET quantity = quantity + 1
+      WHERE eventID = ? AND ticketType = ?
+    `);
+    updateQuantity.run(ticket.eventID, ticket.ticketType);
+
+    //delete from EventTransaction
+    const deleteTransaction = db.prepare(`
+      DELETE FROM EventTransaction
+      WHERE ticketID = ?
+    `);
+    deleteTransaction.run(ticketID);
+
+    //delete from Ticket
+    const deleteTicket = db.prepare(`
+      DELETE FROM Ticket
+      WHERE ticketID = ?
+    `);
+    const info = deleteTicket.run(ticketID);
+
+    if (info.changes > 0) {
+      res.status(200).send({ message: 'Ticket refunded successfully.' });
+    } else {
+      res.status(404).send({ error: 'Ticket not found.' });
+    }
+  } catch (error) {
+    console.error('Error processing refund:', error.message);
+    res.status(500).send({ error: 'Internal server error.' });
+  }
+});
+
+
 app.get('/events/type/:eventType', (req, res) => {
   try {
     const eventType = req.params.eventType;
