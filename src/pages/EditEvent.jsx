@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { useParams } from 'react-router-dom';
 
-
 const EditEvent = () => {
     const { id: eventID } = useParams();
     const navigate = useNavigate();
@@ -43,6 +42,10 @@ const EditEvent = () => {
     };
 
     const removeTicketOption = (indexToRemove) => {
+        const optionToRemove = ticketOptions[indexToRemove];
+        if (optionToRemove.ticketOptionID) {
+            setDeletedTicketOptionIDs(prev => [...prev, optionToRemove.ticketOptionID]);
+        }
         const updated = ticketOptions.filter((_, index) => index !== indexToRemove);
         setTicketOptions(updated);
     };
@@ -60,6 +63,14 @@ const EditEvent = () => {
                 organiserID: cookies.userCookie.username}),
             credentials: 'include'
         });
+        
+        for (const id of deletedTicketOptionIDs) {
+            await fetch(`http://localhost:5000/ticketOptions/${id}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+        }
+
 
         // Update each ticket option
         for (const option of ticketOptions) {
@@ -116,6 +127,8 @@ const EditEvent = () => {
         .then(res => res.json())
         .then(data => setVenues(data));
     }, [eventID]);
+
+    const [deletedTicketOptionIDs, setDeletedTicketOptionIDs] = useState([]);
 
     return (
         <div className="event-wrapper">
