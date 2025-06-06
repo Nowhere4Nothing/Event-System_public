@@ -33,27 +33,70 @@ for (const venue of venues) {
   insertVenue.run(venue.id, venue.name, venue.capacity, imageBuffer);
 }
 
-// Insert users and organiser
+// Insert organisers
+const organisers = [
+  { username: 'organiser1', orgName: 'Tech Events Ltd' },
+  { username: 'organiser2', orgName: 'Live Nation AU' },
+  { username: 'organiser3', orgName: 'Comedy Central Booking' },
+  { username: 'organiser4', orgName: 'EduConnect Conferences' },
+  { username: 'organiser5', orgName: 'Family First Events' },
+  { username: 'organiser6', orgName: 'Startup Spark' },
+  { username: 'organiser7', orgName: 'Arts & Culture Hub' },
+  { username: 'organiser8', orgName: 'Wellness & Community Co.' },
+  { username: 'organiser9', orgName: 'NextGen Music Group' },
+  { username: 'organiser10', orgName: 'Innovation Syndicate' },
+];
+
+const insertUser = db.prepare(`
+  INSERT INTO User (username, password, userType, email, address, phone)
+  VALUES (?, ?, 'Organiser', ?, ?, ?)
+`);
+
+const insertOrganiser = db.prepare(`
+  INSERT INTO Organiser (username, organisationName)
+  VALUES (?, ?)
+`);
+
+for (let i = 0; i < organisers.length; i++) {
+  const { username, orgName } = organisers[i];
+  insertUser.run(
+    username,
+    'pass123',
+    `${username}@events.com`,
+    `${i + 1} Event Blvd`,
+    `04000000${i}`
+  );
+  insertOrganiser.run(username, orgName);
+}
+
+// Insert one guest user
 db.prepare(`
   INSERT INTO User (username, password, userType, email, address, phone) 
-  VALUES 
-    ('organiser1', 'pass123', 'Organiser', 'org1@example.com', '123 Main St', '123456789'),
-    ('user1', 'pass123', 'Guest', 'guest1@example.com', '456 Elm St', '987654321')
+  VALUES ('user1', 'pass123', 'Guest', 'guest1@example.com', '456 Elm St', '987654321')
 `).run();
 
-db.prepare(`
-  INSERT INTO Organiser (username, organisationName) 
-  VALUES ('organiser1', 'Tech Events Ltd')
-`).run();
-
+// Event insertion
 const insertEvent = db.prepare(`
   INSERT INTO Event (
     eventName, eventType, eventDate, venueID, eventDesc, eventTime, performer, banner, organiserID
   ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?)
 `);
 
-// Generate 55 events with unique names and categories
-// For date, start from 2025-06-01 and increment days
+function getDate(offset) {
+  const baseDate = new Date(2025, 5, 1); // June 1, 2025
+  baseDate.setDate(baseDate.getDate() + offset);
+  return baseDate.toISOString().slice(0, 10);
+}
+
+function getRandomTime() {
+  const hour = 9 + Math.floor(Math.random() * 13);
+  const minute = Math.floor(Math.random() * 2) * 30;
+  return `${hour.toString().padStart(2, '0')}:${minute === 0 ? '00' : '30'}`;
+}
+
+function getRandomOrganiser() {
+  return organisers[Math.floor(Math.random() * organisers.length)].username;
+}
 
 const musicArtists = [
   'Taylor Swift', 'Coldplay', 'BTS', 'Ed Sheeran', 'Billie Eilish', 'The Weeknd', 
@@ -82,29 +125,9 @@ const freeEvents = [
   'Gardening Club', 'Photography Walk', 'Meditation Session'
 ];
 
-// Helper function to get date string YYYY-MM-DD starting from a base date + offset days
-function getDate(offset) {
-  const baseDate = new Date(2025, 5, 1); // June 1, 2025 (months 0-indexed)
-  baseDate.setDate(baseDate.getDate() + offset);
-  return baseDate.toISOString().slice(0, 10);
-}
-
-// Random time generator hh:mm format between 09:00 and 21:00
-function getRandomTime() {
-  const hour = 9 + Math.floor(Math.random() * 13); // 9 to 21
-  const minute = Math.floor(Math.random() * 2) * 30; // 0 or 30
-  return `${hour.toString().padStart(2,'0')}:${minute === 0 ? '00' : '30'}`;
-}
-
-// Organiser ID is always 'organiser1'
-const organiserID = 'organiser1';
-
-// Build the 55 events
-
 const events = [];
 let eventCounter = 0;
 
-// Helper to push event
 function addEvent(name, type, dateOffset, venueID, desc, performer) {
   events.push({
     name,
@@ -114,11 +137,10 @@ function addEvent(name, type, dateOffset, venueID, desc, performer) {
     desc,
     time: getRandomTime(),
     performer,
+    organiserID: getRandomOrganiser(),
   });
   eventCounter++;
 }
-
-// Distribute events roughly evenly among categories and venues
 
 // Music - 15 events
 for(let i=0; i<15; i++) {
@@ -155,16 +177,15 @@ for(let i=0; i<10; i++) {
   addEvent(eventName, 'Free', i+45, venue, `Join us for this free community event: ${eventName}.`, '');
 }
 
-// Insert events into DB and keep track of their IDs for ticket options
+// Insert all events
 const eventIDs = [];
 
 for (const e of events) {
-  const info = insertEvent.run(e.name, e.type, e.date, e.venueID, e.desc, e.time, e.performer, organiserID);
+  const info = insertEvent.run(e.name, e.type, e.date, e.venueID, e.desc, e.time, e.performer, e.organiserID);
   eventIDs.push(info.lastInsertRowid);
 }
 
-// Insert ticket options relevant to event type
-
+// Insert ticket options
 const insertTicketOption = db.prepare(`
   INSERT INTO TicketOption (eventID, ticketType, price, quantity) VALUES (?, ?, ?, ?)
 `);

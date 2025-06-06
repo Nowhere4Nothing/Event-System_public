@@ -146,20 +146,31 @@ app.get('/events', (req, res) => {
   try {
     const query = `
       SELECT 
-        Event.eventID,
-        Event.eventName,
-        Event.eventType,
-        Event.eventDate,
-        Event.venueID,
-        Venue.venueName,
-        Event.eventDesc,
-        Event.eventTime,
-        Event.performer,
-        Event.banner,
-        Event.organiserID
-      FROM Event
-      LEFT JOIN Venue ON Event.venueID = Venue.venueID
+        event.eventID,
+        event.eventName,
+        event.eventType,
+        event.eventDate,
+        event.venueID,
+        venue.venueName,
+        event.eventDesc,
+        event.eventTime,
+        event.performer,
+        event.banner,
+        event.organiserID,
+        ticketPrices.minPrice,
+        ticketPrices.maxPrice
+      FROM Event event
+      LEFT JOIN Venue venue ON event.venueID = venue.venueID
+      LEFT JOIN (
+        SELECT 
+          eventID, 
+          MIN(price) AS minPrice, 
+          MAX(price) AS maxPrice
+        FROM TicketOption
+        GROUP BY eventID
+      ) ticketPrices ON event.eventID = ticketPrices.eventID
     `;
+
     const rows = db.prepare(query).all();
     res.json(rows);
   } catch (err) {
@@ -167,6 +178,7 @@ app.get('/events', (req, res) => {
     res.status(500).json({ error: 'Failed to fetch events' });
   }
 });
+
 
 //creating events
 app.post('/events', (req, res) => {
@@ -206,11 +218,14 @@ app.get('/events/:id', (req, res) => {
         Event.eventTime,
         Event.performer,
         Event.banner,
-        Event.organiserID
+        Event.organiserID,
+        Organiser.organisationName
       FROM Event
       LEFT JOIN Venue ON Event.venueID = Venue.venueID
+      LEFT JOIN Organiser ON Event.organiserID = Organiser.username
       WHERE Event.eventID = ?
     `;
+
     const event = db.prepare(eventQuery).get(eventId);
 
     if (!event) {
