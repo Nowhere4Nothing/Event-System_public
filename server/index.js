@@ -206,11 +206,14 @@ app.get('/events/:id', (req, res) => {
         Event.eventTime,
         Event.performer,
         Event.banner,
-        Event.organiserID
+        Event.organiserID,
+        Organiser.organisationName
       FROM Event
       LEFT JOIN Venue ON Event.venueID = Venue.venueID
+      LEFT JOIN Organiser ON Event.organiserID = Organiser.username
       WHERE Event.eventID = ?
     `;
+    
     const event = db.prepare(eventQuery).get(eventId);
 
     if (!event) {

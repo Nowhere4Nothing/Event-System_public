@@ -116,6 +116,7 @@ function EventDetails() {
         <p><strong>Description: </strong>{event.eventDesc}</p>
         <p className="event-date" data-testid="event-date"><strong>Date: </strong>{formatDateToLocal(event.eventDate)}</p>
         <p className="event-time" data-testid="event-time"><strong>Time: </strong>{event.eventTime}</p>
+        <p className="event-organiser"><strong>Organised by: </strong>{event.organisationName}</p>
       </div>
 
       <div className="event-content">
